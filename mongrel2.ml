@@ -125,7 +125,7 @@ let fini z socket socket2 =
 	ZMQ.Socket.close socket2;
 	ZMQ.term z
 
-let main_loop z handler socket socket2 =
+let main_loop handler socket socket2 =
 	Lwt_main.run (handler socket socket2)
 
 let run inbound outbound =
@@ -134,5 +134,5 @@ let run inbound outbound =
 	let socket2 = ZMQ.Socket.create z ZMQ.Socket.pub in
 		ZMQ.Socket.connect socket inbound;
 		ZMQ.Socket.connect socket2 outbound;
-		main_loop z mongrel_handler socket socket2;
+		main_loop mongrel_handler socket socket2;
 		fini z socket socket2

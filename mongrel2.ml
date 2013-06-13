@@ -114,20 +114,19 @@ end = struct
 			sprintf "HTTP/1.1 %d %s\r\n%s\r\n\r\n%s" code status headers' body
 end
 
-let call_and_pair f x =
-	let y = f x in
-	let pair_with_x z = (x, z) in
-		Lwt.map pair_with_x y
-
-let compose f g x = f (g x)
 
 let uncurry f (x, y) = f x y
 
 let handle_reply responder request =
+	let compose f g x = f (g x) in
+
 	let hreq = Wire_Format.parse_request request in
 	let maker response = response >|= HTTP_Response.make in
 	let http_creator = compose maker responder in
-		call_and_pair http_creator hreq >|=
+
+	let payload = http_creator hreq in
+	let pair_with_hreq z = (hreq, z) in
+		Lwt.map pair_with_hreq payload >|=
 		uncurry Wire_Format.make_response
 
 let handoff sock hres =

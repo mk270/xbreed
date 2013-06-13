@@ -126,7 +126,8 @@ let handle_reply responder request =
 
 	let payload_t = http_creator hreq in
 	let pair_with_hreq payload = (hreq, payload) in
-		Lwt.map pair_with_hreq payload_t >|=
+		payload_t >|=
+		pair_with_hreq >|=
 		uncurry Wire_Format.make_response
 
 let handoff sock hres =

@@ -123,7 +123,7 @@ let compose f g x = f (g x)
 
 let uncurry f (x, y) = f x y
 
-let handle_reply_lwt 
+let handle_reply 
 		(responder : mongrel2_request -> mongrel2_response Lwt.t) 
 		request =
 	let hreq = Wire_Format.parse_request request in
@@ -145,7 +145,7 @@ let mongrel_handler responder socket socket2 =
 	let loop () =
 		Lwt_io.printl "Listening" >>=
 		handle_recv lwt_socket >>=
-		handle_reply_lwt responder >>=
+		handle_reply responder >>=
 		handoff lwt_socket2
 	in
 		while_lwt true

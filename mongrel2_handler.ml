@@ -39,9 +39,14 @@ let parse_netstring ns =
 			| _ -> assert false
 
 let parse_headers hh =
+	let get_string = function
+		| key, `String s -> s
+		| _ -> assert false
+	in
+
 	let tmp = Yojson.Safe.from_string hh in
 		match tmp with
-			| `Assoc kvps -> ()
+			| `Assoc kvps -> List.map get_string kvps
 			| _ -> assert false
 
 let parse resp =

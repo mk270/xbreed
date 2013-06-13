@@ -13,6 +13,7 @@
 open Printf
 open Lwt
 open Str
+open Yojson.Safe
 
 type http_req = {
 	hr_uuid : string;
@@ -37,11 +38,18 @@ let parse_netstring ns =
 			| [ len_s; rest; ] -> parse_well_formed len_s rest
 			| _ -> assert false
 
+let parse_headers hh =
+	let tmp = Yojson.Safe.from_string hh in
+		match tmp with
+			| `Assoc kvps -> ()
+			| _ -> assert false
+
 let parse resp =
 	let parse_valid_payload uuid conn_id path rest =
 		let conn_id = int_of_string conn_id in
 		let headers, rest' = parse_netstring rest in
 		let body, _ = parse_netstring rest' in
+		let _ = parse_headers headers in
 			{
 				hr_uuid = uuid;
 				hr_conn_id = conn_id;

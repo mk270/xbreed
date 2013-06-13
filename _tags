@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: a9895a73811773145068ff24b34815bc)
+# DO NOT EDIT (digest: 49525a7977c9e51d2dffbbf570e2156d)
 # Ignore VCS directories, you can use the same kind of rule outside 
 # OASIS_START/STOP if you want to exclude directories that contains 
 # useless stuff for the build process
@@ -19,11 +19,13 @@
 <mongrel2_handler.{native,byte}>: pkg_lwt.syntax
 <mongrel2_handler.{native,byte}>: pkg_lwt-zmq
 <mongrel2_handler.{native,byte}>: pkg_str
+<mongrel2_handler.{native,byte}>: pkg_yojson
 <*.ml{,i}>: pkg_ZMQ
 <*.ml{,i}>: pkg_lwt
 <*.ml{,i}>: pkg_lwt.syntax
 <*.ml{,i}>: pkg_lwt-zmq
 <*.ml{,i}>: pkg_str
+<*.ml{,i}>: pkg_yojson
 <mongrel2_handler.{native,byte}>: custom
 # OASIS_STOP
 <*.ml{,i}>: syntax_camlp4o

@@ -155,3 +155,6 @@ let run_main_loop inbound outbound =
 	let context = init inbound outbound in
 		main_loop mongrel_handler context.mongrel2_inbound context.mongrel2_outbound;
 		fini context
+
+let run context =
+	mongrel_handler context.mongrel2_inbound context.mongrel2_outbound

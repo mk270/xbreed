@@ -47,7 +47,10 @@ module Netstring = struct
 				| _ -> assert false
 end
 
-module Wire_Format = struct
+module Wire_Format : sig
+	val parse_request : string -> mongrel2_request
+	val make_response : string -> int list -> string -> string
+end = struct
 	let parse_headers hh =
 		let get_string = function
 			| key, `String s -> key, s

@@ -48,7 +48,7 @@ end
 
 module Wire_Format : sig
 	val parse_request : string -> mongrel2_request
-	val make_response : string -> int list -> string -> string
+	val make_response : mongrel2_request -> string -> string
 end = struct
 	let by_space = Str.regexp " "
 
@@ -88,12 +88,16 @@ end = struct
 		let header = Printf.sprintf "%s %d:%s," uuid len_s conn_id in
 			header ^ " " ^ msg
 				
-	let make_response uuid idents data =
+	let make_response request data =
+		let uuid = request.m2req_uuid in
+		let idents = [request.m2req_conn_id] in
 		let idents = List.map string_of_int idents in
 			send uuid (String.concat " " idents) data
 end
 
-module HTTP_Response = struct
+module HTTP_Response : sig
+	val make : mongrel2_response -> string
+end = struct
 	let make response =
 		let body = response.m2resp_body in
 		let code = response.m2resp_code in
@@ -114,8 +118,11 @@ end
 let handle_reply responder request =
 	let hreq = Wire_Format.parse_request request in
 	let response = responder hreq in
-	let payload = HTTP_Response.make response in
-		Wire_Format.make_response hreq.m2req_uuid [hreq.m2req_conn_id] payload
+	let payload : string = HTTP_Response.make response in
+		Wire_Format.make_response hreq payload
+
+let mr' payload hreq =
+	Wire_Format.make_response hreq payload
 
 let handoff sock hres =
 	Lwt_zmq.Socket.send sock hres >>=

@@ -30,10 +30,9 @@ type mongrel2_response = {
 	m2resp_headers : (string * string) list;
 }
 
-let by_space = Str.regexp " "
-let by_colon = Str.regexp ":"
-
 module Netstring = struct
+	let by_colon = Str.regexp ":"
+
 	let parse ns =
 		let parse_well_formed len_s rest =
 			let len = int_of_string len_s in
@@ -51,6 +50,8 @@ module Wire_Format : sig
 	val parse_request : string -> mongrel2_request
 	val make_response : string -> int list -> string -> string
 end = struct
+	let by_space = Str.regexp " "
+
 	let parse_headers hh =
 		let get_string = function
 			| key, `String s -> key, s

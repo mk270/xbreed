@@ -93,23 +93,22 @@ let handle_recv sock () =
 	Lwt_zmq.Socket.recv sock
 
 let run inbound outbound =
-  let z = ZMQ.init () in
-  let socket = ZMQ.Socket.create z ZMQ.Socket.pull in
-  let socket2 = ZMQ.Socket.create z ZMQ.Socket.pub in
-	  ZMQ.Socket.connect socket inbound;
-	  ZMQ.Socket.connect socket2 outbound;
-	  Lwt_main.run (
-		  let lwt_socket = Lwt_zmq.Socket.of_socket socket in
-		  let lwt_socket2 = Lwt_zmq.Socket.of_socket socket2 in
-			  Lwt_io.printl "Listening" >>=
-			  handle_recv lwt_socket >|=
-			  handle_reply >>=
-			  handoff lwt_socket2
-	
-      );
-	  ZMQ.Socket.close socket;
-	  ZMQ.term z;
-	  ()
+	let z = ZMQ.init () in
+	let socket = ZMQ.Socket.create z ZMQ.Socket.pull in
+	let socket2 = ZMQ.Socket.create z ZMQ.Socket.pub in
+		ZMQ.Socket.connect socket inbound;
+		ZMQ.Socket.connect socket2 outbound;
+		Lwt_main.run (
+			let lwt_socket = Lwt_zmq.Socket.of_socket socket in
+			let lwt_socket2 = Lwt_zmq.Socket.of_socket socket2 in
+				Lwt_io.printl "Listening" >>=
+				handle_recv lwt_socket >|=
+				handle_reply >>=
+				handoff lwt_socket2
+		);
+		ZMQ.Socket.close socket;
+		ZMQ.term z;
+		()
 
 let () =
 	run "tcp://127.0.0.1:9999" "tcp://127.0.0.1:9998"

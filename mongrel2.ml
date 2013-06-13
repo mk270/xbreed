@@ -121,6 +121,24 @@ let handle_reply responder request =
 	let payload : string = HTTP_Response.make response in
 		Wire_Format.make_response hreq payload
 
+let call_and_pair f x =
+	let y = f x in
+	let pair_with_x z = (x, z) in
+		Lwt.map pair_with_x y
+
+let compose f g x = f (g x)
+
+let uncurry f (x, y) = f x y
+
+let handle_reply_lwt 
+		(responder : mongrel2_request -> mongrel2_response Lwt.t) 
+		request =
+	let hreq = Wire_Format.parse_request request in
+	let http_creator = compose (Lwt.map HTTP_Response.make) responder in
+	let hreq_and_payload = call_and_pair http_creator hreq
+	in
+		Lwt.map (uncurry Wire_Format.make_response) hreq_and_payload
+
 let handoff sock hres =
 	Lwt_zmq.Socket.send sock hres >>=
 		(fun () -> Lwt_io.printlf "resp: [%s]" hres)

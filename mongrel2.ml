@@ -120,8 +120,7 @@ let uncurry f (x, y) = f x y
 let handle_reply responder request =
 	let hreq = Wire_Format.parse_request request in
 	let pair_with_hreq payload = (hreq, payload) in
-	let maker response = response >|= HTTP_Response.make in
-		maker (responder hreq) >|=
+		(responder hreq) >|= HTTP_Response.make >|=
 		pair_with_hreq >|=
 		uncurry Wire_Format.make_response
 

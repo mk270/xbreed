@@ -127,10 +127,10 @@ type ('a, 'b, 'c, 'd, 'e) t = {
 	mongrel2_handler : 'c -> 'd -> 'e Lwt.t;
 }
 
-let fini z socket socket2 =
-	ZMQ.Socket.close socket;
-	ZMQ.Socket.close socket2;
-	ZMQ.term z
+let fini context =
+	ZMQ.Socket.close context.mongrel2_inbound;
+	ZMQ.Socket.close context.mongrel2_outbound;
+	ZMQ.term context.mongrel2_zmp_context
 
 let main_loop handler socket socket2 =
 	Lwt_main.run (handler socket socket2)
@@ -153,4 +153,4 @@ let run inbound outbound =
 		ZMQ.Socket.connect socket inbound;
 		ZMQ.Socket.connect socket2 outbound;
 		main_loop mongrel_handler socket socket2;
-		fini z socket socket2
+		fini context

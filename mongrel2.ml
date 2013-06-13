@@ -100,19 +100,9 @@ let deliver uuid idents data =
 	let idents = List.map string_of_int idents in
 		send uuid (String.concat " " idents) data
 
-let handle_reply reply =
+let handle_reply responder reply =
 	let hreq = parse reply in
-	let page_text = "<html> URI was:" ^
-		(List.assoc "URI" hreq.m2req_headers) ^
-		"</html>"
-	in
-	let headers = [("Content-type", "text/html")] in
-	let response = {
-		m2resp_body = page_text;
-		m2resp_code = 200;
-		m2resp_status = "OK";
-		m2resp_headers = headers;
-	} in
+	let response = responder hreq in
 	let payload =
 		http_response response in
 		deliver hreq.m2req_uuid [hreq.m2req_conn_id] payload
@@ -124,13 +114,13 @@ let handoff sock hres =
 let handle_recv sock () =
 	Lwt_zmq.Socket.recv sock
 
-let mongrel_handler socket socket2 =
+let mongrel_handler responder socket socket2 =
 	let lwt_socket = Lwt_zmq.Socket.of_socket socket in
 	let lwt_socket2 = Lwt_zmq.Socket.of_socket socket2 in
 	let loop () =
 		Lwt_io.printl "Listening" >>=
 		handle_recv lwt_socket >|=
-		handle_reply >>=
+		handle_reply responder >>=
 		handoff lwt_socket2
 	in
 		while_lwt true
@@ -141,7 +131,8 @@ type ('a, 'b, 'c, 'd, 'e) t = {
 	mongrel2_zmp_context : ZMQ.context;
 	mongrel2_inbound : 'a ZMQ.Socket.t;
 	mongrel2_outbound : 'b ZMQ.Socket.t;
-	mongrel2_handler : 'c -> 'd -> 'e Lwt.t;
+	mongrel2_handler : (mongrel2_request -> mongrel2_response)->'c -> 'd -> 'e Lwt.t;
+	mongrel2_responder : mongrel2_request -> mongrel2_response;
 }
 
 let fini context =
@@ -149,10 +140,10 @@ let fini context =
 	ZMQ.Socket.close context.mongrel2_outbound;
 	ZMQ.term context.mongrel2_zmp_context
 
-let main_loop handler socket socket2 =
-	Lwt_main.run (handler socket socket2)
+let main_loop handler socket socket2 responder =
+	Lwt_main.run (handler responder socket socket2)
 
-let _init inbound outbound f =
+let _init inbound outbound f f_resp =
 	let z = ZMQ.init () in
 	let socket = ZMQ.Socket.create z ZMQ.Socket.pull in
 	let socket2 = ZMQ.Socket.create z ZMQ.Socket.pub in
@@ -160,18 +151,19 @@ let _init inbound outbound f =
 		  mongrel2_inbound = socket;
 		  mongrel2_outbound = socket2;
 		  mongrel2_handler = f;
+		  mongrel2_responder = f_resp;
 		}
 
-let init inbound outbound =
-	let context = _init inbound outbound mongrel_handler in
+let init inbound outbound f_resp =
+	let context = _init inbound outbound mongrel_handler f_resp in
 		ZMQ.Socket.connect context.mongrel2_inbound inbound;
 		ZMQ.Socket.connect context.mongrel2_outbound outbound;
 		context
 
-let run_main_loop inbound outbound =
-	let context = init inbound outbound in
-		main_loop mongrel_handler context.mongrel2_inbound context.mongrel2_outbound;
+let run_main_loop inbound outbound f_resp =
+	let context = init inbound outbound f_resp in
+		main_loop mongrel_handler context.mongrel2_inbound context.mongrel2_outbound context.mongrel2_responder;
 		fini context
 
 let run context =
-	mongrel_handler context.mongrel2_inbound context.mongrel2_outbound
+	mongrel_handler context.mongrel2_responder context.mongrel2_inbound context.mongrel2_outbound

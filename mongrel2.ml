@@ -121,9 +121,6 @@ let handle_reply responder request =
 	let payload : string = HTTP_Response.make response in
 		Wire_Format.make_response hreq payload
 
-let mr' payload hreq =
-	Wire_Format.make_response hreq payload
-
 let handoff sock hres =
 	Lwt_zmq.Socket.send sock hres >>=
 		(fun () -> Lwt_io.printlf "resp: [%s]" hres)

@@ -120,11 +120,14 @@ let mongrel_handler socket socket2 =
 			do loop ()
 			done
 
+let fini z socket socket2 =
+	ZMQ.Socket.close socket;
+	ZMQ.Socket.close socket2;
+	ZMQ.term z
+
 let main_loop z handler socket socket2 =
 	Lwt_main.run (handler socket socket2);
-	ZMQ.Socket.close socket;
-	ZMQ.Socket close socket2;
-	ZMQ.term z
+	fini z socket socket2
 
 let run inbound outbound =
 	let z = ZMQ.init () in

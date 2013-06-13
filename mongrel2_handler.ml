@@ -76,7 +76,7 @@ let deliver uuid idents data =
 		send uuid (String.concat " " idents) data
 
 let handle_reply reply =
-    let hreq = parse reply in
+	let hreq = parse reply in
 (*		Lwt_io.printlf "Received: %s %d" hreq.uuid hreq.conn_id >>= *)
 (*			lwt () = Lwt_io.printl "Sending a request" in *)
 	let page_text = "<html>oops</html>" in

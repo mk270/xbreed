@@ -17,3 +17,6 @@ val run_main_loop : string -> string -> unit
 val fini : ('a, 'b, 'c, 'd, 'e) t -> unit
 
 val run :  ('a, 'b, 'c, 'd, 'e) t -> unit Lwt.t
+
+val init : string ->
+  string -> ([> `Pull ], [> `Pub ], 'a ZMQ.Socket.t, 'b ZMQ.Socket.t, unit) t

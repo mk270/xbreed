@@ -107,7 +107,7 @@ let handoff sock hres =
 let handle_recv sock () =
 	Lwt_zmq.Socket.recv sock
 
-let handler socket socket2 =
+let mongrel_handler socket socket2 =
 	let lwt_socket = Lwt_zmq.Socket.of_socket socket in
 	let lwt_socket2 = Lwt_zmq.Socket.of_socket socket2 in
 	let loop () =
@@ -120,7 +120,7 @@ let handler socket socket2 =
 			do loop ()
 			done
 
-let main_loop z socket socket2 =
+let main_loop z handler socket socket2 =
 	Lwt_main.run (handler socket socket2);
 	ZMQ.Socket.close socket;
 	ZMQ.term z;
@@ -132,4 +132,4 @@ let run inbound outbound =
 	let socket2 = ZMQ.Socket.create z ZMQ.Socket.pub in
 		ZMQ.Socket.connect socket inbound;
 		ZMQ.Socket.connect socket2 outbound;
-		main_loop z socket socket2
+		main_loop z mongrel_handler socket socket2

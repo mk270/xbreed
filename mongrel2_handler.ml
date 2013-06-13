@@ -59,9 +59,11 @@ let parse resp =
 let http_response body code status headers =
 	let content_length = String.length body in
 	let headers = ("Content-Length", string_of_int content_length) :: headers in
-	let headers' = String.concat "\r\n" (List.map (fun (k,v) ->
-		k ^ ": " ^ v
-	) headers) in
+	let sep_by_colon kv =
+		let k, v = kv in
+			k ^ ": " ^ v
+	in
+	let headers' = String.concat "\r\n" (List.map sep_by_colon headers) in
 		Printf.sprintf "HTTP/1.1 %d %s\r\n%s\r\n\r\n%s" code status headers' body
 
 let send uuid conn_id msg =

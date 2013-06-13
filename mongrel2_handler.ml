@@ -15,11 +15,11 @@ open Lwt
 open Str
 
 type http_req = {
-	uuid : string;
-	conn_id : int;
-	path : string;
-	headers : string;
-	body : string;
+	hr_uuid : string;
+	hr_conn_id : int;
+	hr_path : string;
+	hr_headers : string;
+	hr_body : string;
 }
 
 let by_space = Str.regexp " "
@@ -43,11 +43,11 @@ let parse resp =
 				let headers, rest' = parse_netstring rest in
 				let body, _ = parse_netstring rest' in
 					{
-						uuid = uuid;
-						conn_id = conn_id;
-						path = path;
-						headers = headers;
-						body = body;
+						hr_uuid = uuid;
+						hr_conn_id = conn_id;
+						hr_path = path;
+						hr_headers = headers;
+						hr_body = body;
 					}
 			| _ -> assert false
 
@@ -76,7 +76,7 @@ let handle_reply reply =
 	let headers = [("Content-type", "text/html")] in
 	let payload =
 		http_response page_text 200 "OK" headers in
-		deliver hreq.uuid [hreq.conn_id] payload
+		deliver hreq.hr_uuid [hreq.hr_conn_id] payload
 
 let handoff sock hres =
 	Lwt_zmq.Socket.send sock hres >>=

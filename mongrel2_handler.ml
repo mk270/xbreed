@@ -52,7 +52,7 @@ let parse resp =
 	in
 	let words = Str.bounded_split by_space resp 4 in
 		match words with
-			| [uuid; conn_id; path; rest] -> 
+			| [uuid; conn_id; path; rest] ->
 				parse_valid_payload uuid conn_id path rest
 			| _ -> assert false
 
@@ -71,7 +71,7 @@ let send uuid conn_id msg =
 	let header = Printf.sprintf "%s %d:%s," uuid len_s conn_id in
 		header ^ " " ^ msg
 
-let deliver uuid idents data = 
+let deliver uuid idents data =
 	let idents = List.map string_of_int idents in
 		send uuid (String.concat " " idents) data
 

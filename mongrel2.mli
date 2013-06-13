@@ -10,4 +10,6 @@
 
 (* this code isn't even supposed to be alpha quality - it's just a hack ATM *)
 
+type ('a, 'b, 'c, 'd, 'e) t
+
 val run : string -> string -> unit

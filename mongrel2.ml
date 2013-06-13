@@ -150,9 +150,7 @@ let init inbound outbound =
 
 let run inbound outbound =
 	let context = init inbound outbound in
-	let socket = context.mongrel2_inbound in
-	let socket2 = context.mongrel2_outbound in
-		ZMQ.Socket.connect socket inbound;
-		ZMQ.Socket.connect socket2 outbound;
+		ZMQ.Socket.connect context.mongrel2_inbound inbound;
+		ZMQ.Socket.connect context.mongrel2_outbound outbound;
 		main_loop mongrel_handler socket socket2;
 		fini context

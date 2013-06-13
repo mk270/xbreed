@@ -123,8 +123,7 @@ let handle_reply responder request =
 	let hreq = Wire_Format.parse_request request in
 	let pair_with_hreq payload = (hreq, payload) in
 	let maker response = response >|= HTTP_Response.make in
-	let http_creator = maker ++ responder in
-		http_creator hreq >|=
+		(maker ++ responder) hreq >|=
 		pair_with_hreq >|=
 		uncurry Wire_Format.make_response
 

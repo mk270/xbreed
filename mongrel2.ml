@@ -146,11 +146,12 @@ let _init inbound outbound mongrel_handler =
 		}
 
 let init inbound outbound =
-	_init inbound outbound mongrel_handler
-
-let run inbound outbound =
-	let context = init inbound outbound in
+	let context = _init inbound outbound mongrel_handler in
 		ZMQ.Socket.connect context.mongrel2_inbound inbound;
 		ZMQ.Socket.connect context.mongrel2_outbound outbound;
-		main_loop mongrel_handler socket socket2;
+		context
+
+let run_main_loop inbound outbound =
+	let context = init inbound outbound in
+		main_loop mongrel_handler context.mongrel2_inbound context.mongrel2_outbound;
 		fini context

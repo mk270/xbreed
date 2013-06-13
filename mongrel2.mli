@@ -12,4 +12,6 @@
 
 type ('a, 'b, 'c, 'd, 'e) t
 
-val run : string -> string -> unit
+val run_main_loop : string -> string -> unit
+
+val fini : ('a, 'b, 'c, 'd, 'e) t -> unit

@@ -13,4 +13,4 @@
 open Mongrel2
 
 let () =
-	Mongrel2.run "tcp://127.0.0.1:9999" "tcp://127.0.0.1:9998"
+	Mongrel2.run_main_loop "tcp://127.0.0.1:9999" "tcp://127.0.0.1:9998"

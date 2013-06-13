@@ -124,9 +124,8 @@ let handle_reply responder request =
 	let maker response = response >|= HTTP_Response.make in
 	let http_creator = compose maker responder in
 
-	let payload_t = http_creator hreq in
 	let pair_with_hreq payload = (hreq, payload) in
-		payload_t >|=
+		http_creator hreq >|=
 		pair_with_hreq >|=
 		uncurry Wire_Format.make_response
 

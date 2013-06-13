@@ -107,12 +107,7 @@ let handoff sock hres =
 let handle_recv sock () =
 	Lwt_zmq.Socket.recv sock
 
-let run inbound outbound =
-	let z = ZMQ.init () in
-	let socket = ZMQ.Socket.create z ZMQ.Socket.pull in
-	let socket2 = ZMQ.Socket.create z ZMQ.Socket.pub in
-		ZMQ.Socket.connect socket inbound;
-		ZMQ.Socket.connect socket2 outbound;
+let main_loop z socket socket2 =
 		Lwt_main.run (
 			let lwt_socket = Lwt_zmq.Socket.of_socket socket in
 			let lwt_socket2 = Lwt_zmq.Socket.of_socket socket2 in
@@ -129,3 +124,11 @@ let run inbound outbound =
 		ZMQ.Socket.close socket;
 		ZMQ.term z;
 		()
+
+let run inbound outbound =
+	let z = ZMQ.init () in
+	let socket = ZMQ.Socket.create z ZMQ.Socket.pull in
+	let socket2 = ZMQ.Socket.create z ZMQ.Socket.pub in
+		ZMQ.Socket.connect socket inbound;
+		ZMQ.Socket.connect socket2 outbound;
+		main_loop z socket socket2

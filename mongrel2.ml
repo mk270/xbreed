@@ -135,7 +135,7 @@ let fini context =
 let main_loop handler socket socket2 =
 	Lwt_main.run (handler socket socket2)
 
-let init inbound outbound mongrel_handler =
+let _init inbound outbound mongrel_handler =
 	let z = ZMQ.init () in
 	let socket = ZMQ.Socket.create z ZMQ.Socket.pull in
 	let socket2 = ZMQ.Socket.create z ZMQ.Socket.pub in
@@ -145,8 +145,11 @@ let init inbound outbound mongrel_handler =
 		  mongrel2_handler = mongrel_handler;
 		}
 
+let init inbound outbound =
+	_init inbound outbound mongrel_handler
+
 let run inbound outbound =
-	let context = init inbound outbound mongrel_handler in
+	let context = init inbound outbound in
 	let z = context.mongrel2_zmp_context in
 	let socket = context.mongrel2_inbound in
 	let socket2 = context.mongrel2_outbound in

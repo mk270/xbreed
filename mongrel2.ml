@@ -131,7 +131,6 @@ type ('a, 'b, 'c, 'd, 'e) t = {
 	mongrel2_zmp_context : ZMQ.context;
 	mongrel2_inbound : 'a ZMQ.Socket.t;
 	mongrel2_outbound : 'b ZMQ.Socket.t;
-	mongrel2_handler : (mongrel2_request -> mongrel2_response)->'c -> 'd -> 'e Lwt.t;
 	mongrel2_responder : mongrel2_request -> mongrel2_response;
 }
 
@@ -143,19 +142,18 @@ let fini context =
 let main_loop handler socket socket2 responder =
 	Lwt_main.run (handler responder socket socket2)
 
-let _init inbound outbound f f_resp =
+let _init inbound outbound f_resp =
 	let z = ZMQ.init () in
 	let socket = ZMQ.Socket.create z ZMQ.Socket.pull in
 	let socket2 = ZMQ.Socket.create z ZMQ.Socket.pub in
 		{ mongrel2_zmp_context = z;
 		  mongrel2_inbound = socket;
 		  mongrel2_outbound = socket2;
-		  mongrel2_handler = f;
 		  mongrel2_responder = f_resp;
 		}
 
 let init inbound outbound f_resp =
-	let context = _init inbound outbound mongrel_handler f_resp in
+	let context = _init inbound outbound f_resp in
 		ZMQ.Socket.connect context.mongrel2_inbound inbound;
 		ZMQ.Socket.connect context.mongrel2_outbound outbound;
 		context

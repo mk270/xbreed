@@ -123,8 +123,7 @@ let mongrel_handler socket socket2 =
 let main_loop z handler socket socket2 =
 	Lwt_main.run (handler socket socket2);
 	ZMQ.Socket.close socket;
-	ZMQ.term z;
-	()
+	ZMQ.term z
 
 let run inbound outbound =
 	let z = ZMQ.init () in

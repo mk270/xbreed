@@ -15,12 +15,12 @@ open Lwt
 open Str
 open Yojson.Safe
 
-type http_req = {
-	mongrel2_uuid : string;
-	mongrel2_conn_id : int;
-	mongrel2_path : string;
-	mongrel2_headers : (string * string) list;
-	mongrel2_body : string;
+type mongrel2_request = {
+	m2req_uuid : string;
+	m2req_conn_id : int;
+	m2req_path : string;
+	m2req_headers : (string * string) list;
+	m2req_body : string;
 }
 
 let by_space = Str.regexp " "
@@ -56,11 +56,11 @@ let parse resp =
 		let body, _ = parse_netstring rest' in
 		let headers = parse_headers headers in
 			{
-				mongrel2_uuid = uuid;
-				mongrel2_conn_id = conn_id;
-				mongrel2_path = path;
-				mongrel2_headers = headers;
-				mongrel2_body = body;
+				m2req_uuid = uuid;
+				m2req_conn_id = conn_id;
+				m2req_path = path;
+				m2req_headers = headers;
+				m2req_body = body;
 			}
 	in
 	let words = Str.bounded_split by_space resp 4 in
@@ -92,13 +92,13 @@ let deliver uuid idents data =
 let handle_reply reply =
 	let hreq = parse reply in
 	let page_text = "<html> URI was:" ^
-		(List.assoc "URI" hreq.mongrel2_headers) ^
+		(List.assoc "URI" hreq.m2req_headers) ^
 		"</html>"
 	in
 	let headers = [("Content-type", "text/html")] in
 	let payload =
 		http_response page_text 200 "OK" headers in
-		deliver hreq.mongrel2_uuid [hreq.mongrel2_conn_id] payload
+		deliver hreq.m2req_uuid [hreq.m2req_conn_id] payload
 
 let handoff sock hres =
 	Lwt_zmq.Socket.send sock hres >>=

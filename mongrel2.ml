@@ -126,9 +126,8 @@ let uncurry f (x, y) = f x y
 let handle_reply responder request =
 	let hreq = Wire_Format.parse_request request in
 	let http_creator = compose (Lwt.map HTTP_Response.make) responder in
-	let hreq_and_payload = call_and_pair http_creator hreq
-	in
-		(uncurry Wire_Format.make_response) =|< hreq_and_payload
+		call_and_pair http_creator hreq >|=
+		(uncurry Wire_Format.make_response)
 
 let handoff sock hres =
 	Lwt_zmq.Socket.send sock hres >>=

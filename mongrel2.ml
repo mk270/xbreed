@@ -128,7 +128,7 @@ let handle_reply responder request =
 	let http_creator = compose (Lwt.map HTTP_Response.make) responder in
 	let hreq_and_payload = call_and_pair http_creator hreq
 	in
-		Lwt.map (uncurry Wire_Format.make_response) hreq_and_payload
+		(uncurry Wire_Format.make_response) =|< hreq_and_payload
 
 let handoff sock hres =
 	Lwt_zmq.Socket.send sock hres >>=

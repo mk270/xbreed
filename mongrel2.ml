@@ -114,13 +114,11 @@ end = struct
 			sprintf "HTTP/1.1 %d %s\r\n%s\r\n\r\n%s" code status headers' body
 end
 
-
-let uncurry f (x, y) = f x y
-
 let handle_reply responder request =
+	let uncurry f (x, y) = f x y in
 	let hreq = Wire_Format.parse_request request in
 	let pair_with_hreq payload = (hreq, payload) in
-		(responder hreq) >|= 
+		(responder hreq) >|=
 		HTTP_Response.make >|=
 		pair_with_hreq >|=
 		uncurry Wire_Format.make_response

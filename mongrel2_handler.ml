@@ -12,9 +12,20 @@
 
 open Mongrel2
 
+let count = ref 0
+
+let dump_args args = 
+	let row (k, v) = "  <tr><td>" ^ k ^ "</td><td>" ^ v ^ "</td></tr>" in
+	let rows = List.map row args in
+		"<table>\n" ^
+			String.concat "\n" rows ^
+		"\n</table>\n"
+
 let respond hreq =
+	incr count;
 	let page_text = "<html> URI was: " ^
-		(List.assoc "URI" hreq.m2req_headers) ^
+		(dump_args hreq.m2req_headers) ^
+		"<br>" ^ (string_of_int !count) ^
 		"</html>"
 	in
 	let headers = [("Content-type", "text/html")] in

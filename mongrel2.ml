@@ -123,9 +123,7 @@ let compose f g x = f (g x)
 
 let uncurry f (x, y) = f x y
 
-let handle_reply 
-		(responder : mongrel2_request -> mongrel2_response Lwt.t) 
-		request =
+let handle_reply responder request =
 	let hreq = Wire_Format.parse_request request in
 	let http_creator = compose (Lwt.map HTTP_Response.make) responder in
 	let hreq_and_payload = call_and_pair http_creator hreq

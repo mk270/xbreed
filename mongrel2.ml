@@ -125,7 +125,7 @@ let uncurry f (x, y) = f x y
 
 let handle_reply responder request =
 	let hreq = Wire_Format.parse_request request in
-	let maker = Lwt.map HTTP_Response.make in
+	let maker response = response >|= HTTP_Response.make in
 	let http_creator = compose maker responder in
 		call_and_pair http_creator hreq >|=
 		uncurry Wire_Format.make_response

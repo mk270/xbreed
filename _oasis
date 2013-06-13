@@ -1,0 +1,19 @@
+OASISFormat: 0.3
+Name:        mongrel2_handler
+Version:     0.1
+Synopsis:    mks thing
+Authors:     Martin Keegan
+License:     Apache
+Plugins:     META (0.3)
+BuildTools:  ocamlbuild
+
+
+Executable base_handler
+  Path:               .
+  MainIs:             mongrel2_handler.ml
+  Build$:             flag(lwt)
+  Custom:             true
+  CompiledObject:     best
+  Install:            false
+  BuildDepends:       ZMQ, lwt, lwt.syntax, lwt-zmq, str
+

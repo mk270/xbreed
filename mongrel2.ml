@@ -118,11 +118,11 @@ end
 let uncurry f (x, y) = f x y
 
 let handle_reply responder request =
-	let compose f g x = f (g x) in
+	let (++) f g x = f (g x) in
 
 	let hreq = Wire_Format.parse_request request in
 	let maker response = response >|= HTTP_Response.make in
-	let http_creator = compose maker responder in
+	let http_creator = maker ++ responder in
 
 	let pair_with_hreq payload = (hreq, payload) in
 		http_creator hreq >|=

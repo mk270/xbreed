@@ -120,6 +120,13 @@ let mongrel_handler socket socket2 =
 			do loop ()
 			done
 
+type ('a, 'b, 'c, 'd, 'e) t = {
+	mongrel2_zmp_context : ZMQ.context;
+	mongrel2_inbound : 'a ZMQ.Socket.t;
+	mongrel2_outbound : 'b ZMQ.Socket.t;
+	mongrel2_handler : 'c -> 'd -> 'e Lwt.t;
+}
+
 let fini z socket socket2 =
 	ZMQ.Socket.close socket;
 	ZMQ.Socket.close socket2;
@@ -127,13 +134,6 @@ let fini z socket socket2 =
 
 let main_loop handler socket socket2 =
 	Lwt_main.run (handler socket socket2)
-
-type ('a, 'b, 'c, 'd, 'e) t = {
-	mongrel2_zmp_context : ZMQ.context;
-	mongrel2_inbound : 'a ZMQ.Socket.t;
-	mongrel2_outbound : 'b ZMQ.Socket.t;
-	mongrel2_handler : 'c -> 'd -> 'e Lwt.t;
-}
 
 let init inbound outbound mongrel_handler =
 	let z = ZMQ.init () in

@@ -59,7 +59,7 @@ module Wire_Format = struct
 				| `Assoc kvps -> List.map get_string kvps
 				| _ -> assert false
 
-	let parse resp =
+	let parse_request resp =
 		let parse_valid_payload uuid conn_id path rest =
 			let conn_id = int_of_string conn_id in
 			let headers, rest' = Netstring.parse rest in
@@ -84,7 +84,7 @@ module Wire_Format = struct
 		let header = Printf.sprintf "%s %d:%s," uuid len_s conn_id in
 			header ^ " " ^ msg
 				
-	let deliver uuid idents data =
+	let make_response uuid idents data =
 		let idents = List.map string_of_int idents in
 			send uuid (String.concat " " idents) data
 end
@@ -108,11 +108,11 @@ end
 
 
 let handle_reply responder reply =
-	let hreq = Wire_Format.parse reply in
+	let hreq = Wire_Format.parse_request reply in
 	let response = responder hreq in
 	let payload =
 		HTTP_Response.make response in
-		Wire_Format.deliver hreq.m2req_uuid [hreq.m2req_conn_id] payload
+		Wire_Format.make_response hreq.m2req_uuid [hreq.m2req_conn_id] payload
 
 let handoff sock hres =
 	Lwt_zmq.Socket.send sock hres >>=

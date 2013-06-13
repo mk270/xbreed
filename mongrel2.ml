@@ -33,79 +33,86 @@ type mongrel2_response = {
 let by_space = Str.regexp " "
 let by_colon = Str.regexp ":"
 
-let parse_netstring ns =
-	let parse_well_formed len_s rest =
-		let len = int_of_string len_s in
-			assert (rest.[len] = ',');
-			(String.sub rest 0 len,
-			 String.sub rest (len + 1) (String.length rest - len - 1))
-	in
-	let words = Str.bounded_split by_colon ns 2 in
-		match words with
-			| [ len_s; rest; ] -> parse_well_formed len_s rest
+module Netstring = struct
+	let parse ns =
+		let parse_well_formed len_s rest =
+			let len = int_of_string len_s in
+				assert (rest.[len] = ',');
+				(String.sub rest 0 len,
+				 String.sub rest (len + 1) (String.length rest - len - 1))
+		in
+		let words = Str.bounded_split by_colon ns 2 in
+			match words with
+				| [ len_s; rest; ] -> parse_well_formed len_s rest
+				| _ -> assert false
+end
+
+module Wire_Format = struct
+	let parse_headers hh =
+		let get_string = function
+			| key, `String s -> key, s
 			| _ -> assert false
+		in
 
-let parse_headers hh =
-	let get_string = function
-		| key, `String s -> key, s
-		| _ -> assert false
-	in
+		let tmp = Yojson.Safe.from_string hh in
+			match tmp with
+				| `Assoc kvps -> List.map get_string kvps
+				| _ -> assert false
 
-	let tmp = Yojson.Safe.from_string hh in
-		match tmp with
-			| `Assoc kvps -> List.map get_string kvps
-			| _ -> assert false
+	let parse resp =
+		let parse_valid_payload uuid conn_id path rest =
+			let conn_id = int_of_string conn_id in
+			let headers, rest' = Netstring.parse rest in
+			let body, _ = Netstring.parse rest' in
+			let headers = parse_headers headers in
+				{
+					m2req_uuid = uuid;
+					m2req_conn_id = conn_id;
+					m2req_path = path;
+					m2req_headers = headers;
+					m2req_body = body;
+				}
+		in
+		let words = Str.bounded_split by_space resp 4 in
+			match words with
+				| [uuid; conn_id; path; rest] ->
+					parse_valid_payload uuid conn_id path rest
+				| _ -> assert false
 
-let parse resp =
-	let parse_valid_payload uuid conn_id path rest =
-		let conn_id = int_of_string conn_id in
-		let headers, rest' = parse_netstring rest in
-		let body, _ = parse_netstring rest' in
-		let headers = parse_headers headers in
-			{
-				m2req_uuid = uuid;
-				m2req_conn_id = conn_id;
-				m2req_path = path;
-				m2req_headers = headers;
-				m2req_body = body;
-			}
-	in
-	let words = Str.bounded_split by_space resp 4 in
-		match words with
-			| [uuid; conn_id; path; rest] ->
-				parse_valid_payload uuid conn_id path rest
-			| _ -> assert false
+	let send uuid conn_id msg =
+		let len_s = String.length conn_id in
+		let header = Printf.sprintf "%s %d:%s," uuid len_s conn_id in
+			header ^ " " ^ msg
+				
+	let deliver uuid idents data =
+		let idents = List.map string_of_int idents in
+			send uuid (String.concat " " idents) data
+end
 
-let http_response response =
-	let body = response.m2resp_body in
-	let code = response.m2resp_code in
-	let status = response.m2resp_status in
-	let headers = response.m2resp_headers in
-	let content_length = String.length body in
-	let headers = ("Content-Length", string_of_int content_length) :: headers
-	in
-	let sep_by_colon kv =
-		let k, v = kv in
-			k ^ ": " ^ v
-	in
-	let headers' = String.concat "\r\n" (List.map sep_by_colon headers) in
-		sprintf "HTTP/1.1 %d %s\r\n%s\r\n\r\n%s" code status headers' body
+module HTTP_Response = struct
+	let make response =
+		let body = response.m2resp_body in
+		let code = response.m2resp_code in
+		let status = response.m2resp_status in
+		let headers = response.m2resp_headers in
+		let content_length = String.length body in
+		let headers = ("Content-Length", string_of_int content_length) :: headers
+		in
+		let sep_by_colon kv =
+			let k, v = kv in
+				k ^ ": " ^ v
+		in
+		let headers' = String.concat "\r\n" (List.map sep_by_colon headers) in
+			sprintf "HTTP/1.1 %d %s\r\n%s\r\n\r\n%s" code status headers' body
+end
 
-let send uuid conn_id msg =
-	let len_s = String.length conn_id in
-	let header = Printf.sprintf "%s %d:%s," uuid len_s conn_id in
-		header ^ " " ^ msg
-
-let deliver uuid idents data =
-	let idents = List.map string_of_int idents in
-		send uuid (String.concat " " idents) data
 
 let handle_reply responder reply =
-	let hreq = parse reply in
+	let hreq = Wire_Format.parse reply in
 	let response = responder hreq in
 	let payload =
-		http_response response in
-		deliver hreq.m2req_uuid [hreq.m2req_conn_id] payload
+		HTTP_Response.make response in
+		Wire_Format.deliver hreq.m2req_uuid [hreq.m2req_conn_id] payload
 
 let handoff sock hres =
 	Lwt_zmq.Socket.send sock hres >>=

@@ -26,29 +26,34 @@ let by_space = Str.regexp " "
 let by_colon = Str.regexp ":"
 
 let parse_netstring ns =
+	let parse_well_formed len_s rest =
+		let len = int_of_string len_s in
+			assert (rest.[len] = ',');
+			(String.sub rest 0 len,
+			 String.sub rest (len + 1) (String.length rest - len - 1))
+	in
 	let words = Str.bounded_split by_colon ns 2 in
 		match words with
-			| [ len_s; rest; ] ->
-				let len = int_of_string len_s in
-					assert (rest.[len] = ',');
-					(String.sub rest 0 len, 
-					 String.sub rest (len + 1) (String.length rest - len - 1))		
+			| [ len_s; rest; ] -> parse_well_formed len_s rest
 			| _ -> assert false
-		
+
 let parse resp =
+	let parse_valid_payload uuid conn_id path rest =
+		let conn_id = int_of_string conn_id in
+		let headers, rest' = parse_netstring rest in
+		let body, _ = parse_netstring rest' in
+			{
+				hr_uuid = uuid;
+				hr_conn_id = conn_id;
+				hr_path = path;
+				hr_headers = headers;
+				hr_body = body;
+			}
+	in
 	let words = Str.bounded_split by_space resp 4 in
 		match words with
 			| [uuid; conn_id; path; rest] -> 
-				let conn_id = int_of_string conn_id in
-				let headers, rest' = parse_netstring rest in
-				let body, _ = parse_netstring rest' in
-					{
-						hr_uuid = uuid;
-						hr_conn_id = conn_id;
-						hr_path = path;
-						hr_headers = headers;
-						hr_body = body;
-					}
+				parse_valid_payload uuid conn_id path rest
 			| _ -> assert false
 
 let http_response body code status headers =

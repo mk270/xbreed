@@ -107,20 +107,21 @@ let handoff sock hres =
 let handle_recv sock () =
 	Lwt_zmq.Socket.recv sock
 
+let handler socket socket2 =
+	let lwt_socket = Lwt_zmq.Socket.of_socket socket in
+	let lwt_socket2 = Lwt_zmq.Socket.of_socket socket2 in
+	let loop () =
+		Lwt_io.printl "Listening" >>=
+		handle_recv lwt_socket >|=
+		handle_reply >>=
+		handoff lwt_socket2
+	in
+		while_lwt true
+			do loop ()
+			done
+
 let main_loop z socket socket2 =
-	Lwt_main.run (
-		let lwt_socket = Lwt_zmq.Socket.of_socket socket in
-		let lwt_socket2 = Lwt_zmq.Socket.of_socket socket2 in
-		let loop () =
-			Lwt_io.printl "Listening" >>=
-			handle_recv lwt_socket >|=
-			handle_reply >>=
-			handoff lwt_socket2
-		in
-			while_lwt true
-				do loop ()
-				done
-		);
+	Lwt_main.run (handler socket socket2);
 	ZMQ.Socket.close socket;
 	ZMQ.term z;
 	()

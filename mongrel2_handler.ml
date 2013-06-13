@@ -29,7 +29,7 @@ let respond hreq =
 		"</html>"
 	in
 	let headers = [("Content-type", "text/html")] in
-		{
+		Lwt.return {
 			m2resp_body = page_text;
 			m2resp_code = 200;
 			m2resp_status = "OK";

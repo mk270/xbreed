@@ -151,8 +151,8 @@ let mongrel_handler responder socket socket2 =
 	let lwt_socket2 = Lwt_zmq.Socket.of_socket socket2 in
 	let loop () =
 		Lwt_io.printl "Listening" >>=
-		handle_recv lwt_socket >|=
-		handle_reply responder >>=
+		handle_recv lwt_socket >>=
+		handle_reply_lwt responder >>=
 		handoff lwt_socket2
 	in
 		while_lwt true
@@ -163,7 +163,7 @@ type ('a, 'b, 'c, 'd, 'e) t = {
 	mongrel2_zmp_context : ZMQ.context;
 	mongrel2_inbound : 'a ZMQ.Socket.t;
 	mongrel2_outbound : 'b ZMQ.Socket.t;
-	mongrel2_responder : mongrel2_request -> mongrel2_response;
+	mongrel2_responder : mongrel2_request -> mongrel2_response Lwt.t;
 }
 
 let fini context =

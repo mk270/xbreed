@@ -19,7 +19,7 @@ type http_req = {
 	hr_uuid : string;
 	hr_conn_id : int;
 	hr_path : string;
-	hr_headers : string;
+	hr_headers : (string * string) list;
 	hr_body : string;
 }
 
@@ -40,7 +40,7 @@ let parse_netstring ns =
 
 let parse_headers hh =
 	let get_string = function
-		| key, `String s -> s
+		| key, `String s -> key, s
 		| _ -> assert false
 	in
 
@@ -54,7 +54,7 @@ let parse resp =
 		let conn_id = int_of_string conn_id in
 		let headers, rest' = parse_netstring rest in
 		let body, _ = parse_netstring rest' in
-		let _ = parse_headers headers in
+		let headers = parse_headers headers in
 			{
 				hr_uuid = uuid;
 				hr_conn_id = conn_id;
@@ -71,13 +71,14 @@ let parse resp =
 
 let http_response body code status headers =
 	let content_length = String.length body in
-	let headers = ("Content-Length", string_of_int content_length) :: headers in
+	let headers = ("Content-Length", string_of_int content_length) :: headers
+	in
 	let sep_by_colon kv =
 		let k, v = kv in
 			k ^ ": " ^ v
 	in
 	let headers' = String.concat "\r\n" (List.map sep_by_colon headers) in
-		Printf.sprintf "HTTP/1.1 %d %s\r\n%s\r\n\r\n%s" code status headers' body
+		sprintf "HTTP/1.1 %d %s\r\n%s\r\n\r\n%s" code status headers' body
 
 let send uuid conn_id msg =
 	let len_s = String.length conn_id in
@@ -90,9 +91,10 @@ let deliver uuid idents data =
 
 let handle_reply reply =
 	let hreq = parse reply in
-(*		Lwt_io.printlf "Received: %s %d" hreq.uuid hreq.conn_id >>= *)
-(*			lwt () = Lwt_io.printl "Sending a request" in *)
-	let page_text = "<html>oops</html>" in
+	let page_text = "<html> URI was:" ^
+		(List.assoc "URI" hreq.hr_headers) ^
+		"</html>"
+	in
 	let headers = [("Content-type", "text/html")] in
 	let payload =
 		http_response page_text 200 "OK" headers in

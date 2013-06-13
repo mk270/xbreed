@@ -12,7 +12,7 @@
 
 open Mongrel2
 
-let respond hreq = 
+let respond hreq =
 	let page_text = "<html> URI was: " ^
 		(List.assoc "URI" hreq.m2req_headers) ^
 		"</html>"
@@ -26,8 +26,8 @@ let respond hreq =
 		}
 
 let () =
-	let context = Mongrel2.init 
-		"tcp://127.0.0.1:9999" "tcp://127.0.0.1:9998" respond 
+	let context = Mongrel2.init
+		"tcp://127.0.0.1:9999" "tcp://127.0.0.1:9998" respond
 	in
 		Lwt_main.run (Mongrel2.run context);
 		Mongrel2.fini context

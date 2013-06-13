@@ -23,6 +23,13 @@ type mongrel2_request = {
 	m2req_body : string;
 }
 
+type mongrel2_response = {
+	m2resp_body : string;
+	m2resp_code : int;
+	m2resp_status : string;
+	m2resp_headers : (string * string) list;
+}
+
 let by_space = Str.regexp " "
 let by_colon = Str.regexp ":"
 
@@ -69,7 +76,11 @@ let parse resp =
 				parse_valid_payload uuid conn_id path rest
 			| _ -> assert false
 
-let http_response body code status headers =
+let http_response response =
+	let body = response.m2resp_body in
+	let code = response.m2resp_code in
+	let status = response.m2resp_status in
+	let headers = response.m2resp_headers in
 	let content_length = String.length body in
 	let headers = ("Content-Length", string_of_int content_length) :: headers
 	in
@@ -96,8 +107,14 @@ let handle_reply reply =
 		"</html>"
 	in
 	let headers = [("Content-type", "text/html")] in
+	let response = {
+		m2resp_body = page_text;
+		m2resp_code = 200;
+		m2resp_status = "OK";
+		m2resp_headers = headers;
+	} in
 	let payload =
-		http_response page_text 200 "OK" headers in
+		http_response response in
 		deliver hreq.m2req_uuid [hreq.m2req_conn_id] payload
 
 let handoff sock hres =

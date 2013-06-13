@@ -114,8 +114,7 @@ end
 let handle_reply responder reply =
 	let hreq = Wire_Format.parse_request reply in
 	let response = responder hreq in
-	let payload =
-		HTTP_Response.make response in
+	let payload = HTTP_Response.make response in
 		Wire_Format.make_response hreq.m2req_uuid [hreq.m2req_conn_id] payload
 
 let handoff sock hres =

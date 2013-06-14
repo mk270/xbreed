@@ -58,20 +58,14 @@ let handler3 request matched_args =
 let not_found request matched_args =
 	generic_response "Not found" 404 "Not Found"
 
-let dispatch request =
+let _dispatch handlers handle_404 request =
 	let matches pat =
 		let uri = List.assoc "URI" request.m2req_headers in
 			Pcre.extract_all ~pat uri
 	in
-
-	let handlers = [
-		("^/person$", handler1);
-		("^/ockleon$", handler2);
-		("^/", handler3);
-	] in
 		
 	let rec handle = function
-		| [] -> not_found request [||]
+		| [] -> handle_404 request [||]
 		| (url_regexp, handler) :: tl ->
 			try_lwt let args = matches url_regexp in
 						handler request args
@@ -79,6 +73,14 @@ let dispatch request =
 				handle tl
 	in
 		handle handlers
+
+let dispatch request =
+	let handlers = [
+		("^/person$", handler1);
+		("^/ockleon$", handler2);
+		("^/", handler3);
+	] in
+		_dispatch handlers not_found request
 	
 let () =
 	let context = Mongrel2.init

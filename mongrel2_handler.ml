@@ -14,22 +14,6 @@ open Lwt
 open Mongrel2
 open Pcre
 
-let count = ref 0
-
-let dump_args args =
-	let row (k, v) = "  <tr><td>" ^ k ^ "</td><td>" ^ v ^ "</td></tr>" in
-	let rows = List.map row args in
-		"<table>\n" ^
-			String.concat "\n" rows ^
-		"\n</table>\n"
-
-(*
-	let page_text = "<html> URI was: " ^
-		(dump_args hreq.m2req_headers) ^
-		"<br>" ^ (string_of_int !count) ^
-		"</html>"
-	in *)
-
 let generic_response body code status =
 	Lwt.return {
 		m2resp_body = body;

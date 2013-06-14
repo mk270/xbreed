@@ -19,6 +19,7 @@ module Generator : sig
 	type handler = Mongrel2.mongrel2_request -> string array -> Mongrel2.mongrel2_response Lwt.t
 
 	val serve_file : handler
+	val serve_md_file : handler
 
 	val not_found : 'a -> 'b -> Mongrel2.mongrel2_response Lwt.t
 
@@ -63,6 +64,11 @@ end = struct
 		let filename = "." ^ uri in
 			serve_from_file filename request
 
+	let serve_md_file request matched_args =
+		let uri = List.assoc "URI" request.m2req_headers in
+		let filename = "." ^ uri in
+			serve_from_file filename request
+
 	let not_found request matched_args =
 		return_generic_response "Not found" Code.Not_Found
 
@@ -103,6 +109,7 @@ end
 
 let run inbound_address outbound_address =
 	let handlers =  [
+		("^/.*\\.md$", Generator.serve_md_file);
 		("^/", Generator.serve_file);
 	] in
 	let dispatcher = Dispatcher.make handlers Generator.not_found in

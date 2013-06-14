@@ -9,7 +9,7 @@ BuildTools:  ocamlbuild
 
 
 Executable base_handler
-  Path:               .
+  Path:               src
   MainIs:             mongrel2_handler.ml
   Build$:             flag(lwt)
   Custom:             true

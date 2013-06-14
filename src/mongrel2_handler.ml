@@ -15,12 +15,17 @@ open Mongrel2
 open Pcre
 
 module Generator : sig 
-	val serve_file : Mongrel2.mongrel2_request ->
-           'a -> Mongrel2.mongrel2_response Lwt.t
+
+	type handler = Mongrel2.mongrel2_request -> string array -> Mongrel2.mongrel2_response Lwt.t
+
+	val serve_file : handler
 
 	val not_found : 'a -> 'b -> Mongrel2.mongrel2_response Lwt.t
 
 end = struct
+
+	type handler = Mongrel2.mongrel2_request -> string array -> Mongrel2.mongrel2_response Lwt.t
+
 	let generic_response body status =
 		{
 			m2resp_body = body;

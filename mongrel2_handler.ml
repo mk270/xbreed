@@ -41,8 +41,7 @@ let serve_from_file filename hreq =
 			generic_response "File not found" 404 "Not Found"
 		| _ -> generic_response "Internal server error" 500 "Internal Server Error"
 
-let respond hreq =
-	serve_from_file "/etc/services" hreq
+let respond hreq = serve_from_file "/etc/services" hreq
 
 let normal_document s = generic_response s 200 "OK"
 

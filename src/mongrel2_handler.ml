@@ -14,6 +14,8 @@ open Lwt
 open Mongrel2
 open Pcre
 
+let uri_of_request request = List.assoc "URI" request.m2req_headers
+
 module Generator : sig 
 
 	type handler = Mongrel2.mongrel2_request -> string array -> Mongrel2.mongrel2_response Lwt.t
@@ -60,12 +62,12 @@ end = struct
 	let normal_document s = return_generic_response s Code.OK
 
 	let serve_file request matched_args =
-		let uri = List.assoc "URI" request.m2req_headers in
+		let uri = uri_of_request request in
 		let filename = "." ^ uri in
 			serve_from_file filename request
 
 	let serve_md_file request matched_args =
-		let uri = List.assoc "URI" request.m2req_headers in
+		let uri = uri_of_request request in
 		let filename = "." ^ uri in
 			serve_from_file filename request
 
@@ -88,7 +90,7 @@ end = struct
 
 	let dispatch handlers handle_404 request =
 		let matches pat =
-			let uri = List.assoc "URI" request.m2req_headers in
+			let uri = uri_of_request request in
 				Pcre.extract ~pat uri
 		in
 

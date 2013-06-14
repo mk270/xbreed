@@ -48,8 +48,6 @@ end = struct
 			generic_response "File not found" Code.Not_Found
 		| _ -> generic_response "Internal server error" Code.Internal_server_error
 
-	let respond hreq = serve_from_file "/etc/services" hreq
-
 	let normal_document s = generic_response s Code.OK
 
 	let serve_file request matched_args =

@@ -14,23 +14,12 @@ open Lwt
 open Mongrel2
 open Pcre
 
-module Dispatcher : sig
-	val make : (string *
-					(Mongrel2.mongrel2_request -> string array -> 'a Lwt.t))
-           list ->
-           (Mongrel2.mongrel2_request -> 'b array -> 'a Lwt.t) ->
-           Mongrel2.mongrel2_request -> 'a Lwt.t
-
+module Generator : sig 
 	val serve_file : Mongrel2.mongrel2_request ->
            'a -> Mongrel2.mongrel2_response Lwt.t
 
 	val not_found : 'a -> 'b -> Mongrel2.mongrel2_response Lwt.t
-
-
 end = struct
-
-(* 	type handler = mongrel2_request -> string array -> 'a Lwt.t *)
-
 	let generic_response body code status =
 		Lwt.return {
 			m2resp_body = body;
@@ -75,6 +64,20 @@ end = struct
 	let not_found request matched_args =
 		generic_response "Not found" 404 "Not Found"
 
+end
+
+module Dispatcher : sig
+	val make : (string *
+					(Mongrel2.mongrel2_request -> string array -> 'a Lwt.t))
+           list ->
+           (Mongrel2.mongrel2_request -> 'b array -> 'a Lwt.t) ->
+           Mongrel2.mongrel2_request -> 'a Lwt.t
+
+
+end = struct
+
+(* 	type handler = mongrel2_request -> string array -> 'a Lwt.t *)
+
 	let dispatch handlers handle_404 request =
 		let matches pat =
 			let uri = List.assoc "URI" request.m2req_headers in
@@ -98,9 +101,9 @@ end
 
 let () =
 	let handlers =  [
-		("^/", Dispatcher.serve_file);
+		("^/", Generator.serve_file);
 	] in
-	let dispatcher = Dispatcher.make handlers Dispatcher.not_found in
+	let dispatcher = Dispatcher.make handlers Generator.not_found in
 	let context = Mongrel2.init
 		"tcp://127.0.0.1:9999" "tcp://127.0.0.1:9998" dispatcher
 	in

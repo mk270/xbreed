@@ -58,7 +58,7 @@ let handler3 request matched_args =
 let not_found request matched_args =
 	generic_response "Not found" 404 "Not Found"
 
-let _dispatch handlers handle_404 request =
+let dispatch handlers handle_404 request =
 	let matches pat =
 		let uri = List.assoc "URI" request.m2req_headers in
 			Pcre.extract_all ~pat uri
@@ -74,17 +74,18 @@ let _dispatch handlers handle_404 request =
 	in
 		handle handlers
 
-let dispatch request =
-	let handlers = [
+let make_dispatcher handlers not_found =
+	dispatch handlers not_found
+	
+let () =
+	let handlers =  [
 		("^/person$", handler1);
 		("^/ockleon$", handler2);
 		("^/", handler3);
 	] in
-		_dispatch handlers not_found request
-	
-let () =
+	let dispatcher = make_dispatcher handlers not_found in
 	let context = Mongrel2.init
-		"tcp://127.0.0.1:9999" "tcp://127.0.0.1:9998" dispatch
+		"tcp://127.0.0.1:9999" "tcp://127.0.0.1:9998" dispatcher
 	in
 		Lwt_main.run (Mongrel2.run context);
 		Mongrel2.fini context

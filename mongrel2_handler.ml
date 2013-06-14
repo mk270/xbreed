@@ -15,7 +15,7 @@ open Mongrel2
 open Pcre
 
 module Dispatcher : sig
-	val make : (string * 
+	val make : (string *
 					(Mongrel2.mongrel2_request -> string array -> 'a Lwt.t))
            list ->
            (Mongrel2.mongrel2_request -> 'b array -> 'a Lwt.t) ->
@@ -41,19 +41,19 @@ end = struct
 
 	let serve_from_file filename hreq =
 		let headers = [("Content-type", "text/html")] in
-			
+
 		let restructure_thingy text = {
 			m2resp_body = text;
 			m2resp_code = 200;
 			m2resp_status = "OK";
 			m2resp_headers = headers;
 		} in
-			
+
 		try_lwt let page_text =
 					Lwt_io.with_file ~mode:Lwt_io.Input filename Lwt_io.read
 				in
 					restructure_thingy =|< page_text
-	with 
+	with
 		| Unix.Unix_error (Unix.ENOENT, _, _) ->
 			generic_response "File not found" 404 "Not Found"
 		| _ -> generic_response "Internal server error" 500 "Internal Server Error"
@@ -80,7 +80,7 @@ end = struct
 			let uri = List.assoc "URI" request.m2req_headers in
 				Pcre.extract ~pat uri
 		in
-		
+
 		let rec handle = function
 			| [] -> handle_404 request [||]
 			| (url_regexp, handler) :: tl ->

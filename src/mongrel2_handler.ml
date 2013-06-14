@@ -21,11 +21,11 @@ module Generator : sig
 	val not_found : 'a -> 'b -> Mongrel2.mongrel2_response Lwt.t
 
 end = struct
-	let generic_response body code status =
+	let generic_response body status =
 		Lwt.return {
 			m2resp_body = body;
-			m2resp_code = code;
-			m2resp_status = status;
+			m2resp_code = Code.int_of_status status;
+			m2resp_status = Code.string_of_status status;
 			m2resp_headers = [("Content-type", "text/html")];
 		}
 
@@ -45,12 +45,12 @@ end = struct
 					restructure_thingy =|< page_text
 	with
 		| Unix.Unix_error (Unix.ENOENT, _, _) ->
-			generic_response "File not found" 404 "Not Found"
-		| _ -> generic_response "Internal server error" 500 "Internal Server Error"
+			generic_response "File not found" Code.Not_Found
+		| _ -> generic_response "Internal server error" Code.Internal_server_error
 
 	let respond hreq = serve_from_file "/etc/services" hreq
 
-	let normal_document s = generic_response s 200 "OK"
+	let normal_document s = generic_response s Code.OK
 
 	let serve_file request matched_args =
 		let uri = List.assoc "URI" request.m2req_headers in
@@ -58,7 +58,7 @@ end = struct
 			serve_from_file filename request
 
 	let not_found request matched_args =
-		generic_response "Not found" 404 "Not Found"
+		generic_response "Not found" Code.Not_Found
 
 end
 

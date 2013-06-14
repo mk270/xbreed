@@ -68,23 +68,26 @@ let int_of_status = function
   | Service_unavailable -> 503
   | Gateway_time_out -> 504
 
-let body_string_of_status = function
-  | OK -> "200 OK"
-  | Moved_permanently -> "301 Moved Permanently"
-  | Found -> "302 Found"
-  | See_other -> "303 See Other"
-  | Temporary_redirect -> "307 Temporary Redirect"
-  | Bad_request -> "400 Bad Request"
-  | Unauthorized -> "401 Unauthorized"
-  | Forbidden -> "403 Forbidden"
-  | Not_Found -> "404 Not Found"
-  | Method_not_allowed -> "405 Method Not Allowed"
-  | Request_time_out -> "408 Request Time Out"
-  | Internal_server_error -> "500 Internal Server Error"
-  | Not_implemented -> "501 Not Implemented"
-  | Bad_gateway -> "502 Bad Gateway"
-  | Service_unavailable -> "503 Service Unavailable"
-  | Gateway_time_out -> "504 Gateway Timeout"
+let string_of_status = function
+  | OK -> "OK"
+  | Moved_permanently -> "Moved Permanently"
+  | Found -> "Found"
+  | See_other -> "See Other"
+  | Temporary_redirect -> "Temporary Redirect"
+  | Bad_request -> "Bad Request"
+  | Unauthorized -> "Unauthorized"
+  | Forbidden -> "Forbidden"
+  | Not_Found -> "Not Found"
+  | Method_not_allowed -> "Method Not Allowed"
+  | Request_time_out -> "Request Time Out"
+  | Internal_server_error -> "Internal Server Error"
+  | Not_implemented -> "Not Implemented"
+  | Bad_gateway -> "Bad Gateway"
+  | Service_unavailable -> "Service Unavailable"
+  | Gateway_time_out -> "Gateway Timeout"
+
+let body_string_of_status s =
+	(string_of_int (int_of_status s)) ^ " " ^ (string_of_status s)
 
 let string_of_int = function
   | 100 -> "Continue"

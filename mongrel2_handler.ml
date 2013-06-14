@@ -110,6 +110,11 @@ let run inbound_address outbound_address =
 		Mongrel2.fini context
 
 let () =
-	let inbound_address = "tcp://127.0.0.1:9999" in
-	let outbound_address = "tcp://127.0.0.1:9998" in
-		run inbound_address outbound_address
+	let inbound_address = ref "tcp://127.0.0.1:9999" in
+	let outbound_address = ref "tcp://127.0.0.1:9998" in
+	let speclist = [
+		("--in" , Arg.Set_string inbound_address, "TBD");
+		("--out", Arg.Set_string outbound_address, "TBD");
+	] in
+	Arg.parse speclist (fun s -> assert false) "Usage: TBD";
+		run !inbound_address !outbound_address

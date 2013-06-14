@@ -52,7 +52,7 @@ end = struct
 		try_lwt let page_text =
 					Lwt_io.with_file ~mode:Lwt_io.Input filename Lwt_io.read
 				in
-					restructure_thingy =|< page_text
+					page_text >|= filter >|= restructure_thingy
 		with
 			| Unix.Unix_error (Unix.ENOENT, _, _) ->
 				return_generic_error Code.Not_Found

@@ -19,6 +19,7 @@ module Generator : sig
            'a -> Mongrel2.mongrel2_response Lwt.t
 
 	val not_found : 'a -> 'b -> Mongrel2.mongrel2_response Lwt.t
+
 end = struct
 	let generic_response body code status =
 		Lwt.return {

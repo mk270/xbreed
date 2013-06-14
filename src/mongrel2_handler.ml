@@ -43,8 +43,8 @@ end = struct
 	let return_generic_error status =
 		let body = Code.body_string_of_status status in
 			Lwt.return (generic_response body status)
-
-	let serve_from_file filename hreq =
+				
+	let serve_from_file filename hreq filter =
 		let restructure_thingy text = 
 			generic_response text Code.OK
 		in
@@ -64,12 +64,12 @@ end = struct
 	let serve_file request matched_args =
 		let uri = uri_of_request request in
 		let filename = "." ^ uri in
-			serve_from_file filename request
+			serve_from_file filename request (fun i -> i)
 
 	let serve_md_file request matched_args =
 		let uri = uri_of_request request in
 		let filename = "." ^ uri in
-			serve_from_file filename request
+			serve_from_file filename request (fun i -> i)
 
 	let not_found request matched_args =
 		return_generic_response "Not found" Code.Not_Found

@@ -14,7 +14,22 @@ open Lwt
 open Mongrel2
 open Pcre
 
-module Dispatcher = struct
+module Dispatcher : sig
+	val make : (string * 
+					(Mongrel2.mongrel2_request -> string array -> 'a Lwt.t))
+           list ->
+           (Mongrel2.mongrel2_request -> 'b array -> 'a Lwt.t) ->
+           Mongrel2.mongrel2_request -> 'a Lwt.t
+
+	val serve_file : Mongrel2.mongrel2_request ->
+           'a -> Mongrel2.mongrel2_response Lwt.t
+
+	val not_found : 'a -> 'b -> Mongrel2.mongrel2_response Lwt.t
+
+
+end = struct
+
+(* 	type handler = mongrel2_request -> string array -> 'a Lwt.t *)
 
 	let generic_response body code status =
 		Lwt.return {
@@ -52,7 +67,7 @@ module Dispatcher = struct
 	let handler2 request matched_args =
 		respond request
 
-	let handler3 request matched_args =
+	let serve_file request matched_args =
 		let uri = List.assoc "URI" request.m2req_headers in
 		let filename = "." ^ uri in
 			serve_from_file filename request
@@ -63,7 +78,7 @@ module Dispatcher = struct
 	let dispatch handlers handle_404 request =
 		let matches pat =
 			let uri = List.assoc "URI" request.m2req_headers in
-				Pcre.extract_all ~pat uri
+				Pcre.extract ~pat uri
 		in
 		
 		let rec handle = function
@@ -83,9 +98,7 @@ end
 
 let () =
 	let handlers =  [
-		("^/person$", Dispatcher.handler1);
-		("^/ockleon$", Dispatcher.handler2);
-		("^/", Dispatcher.handler3);
+		("^/", Dispatcher.serve_file);
 	] in
 	let dispatcher = Dispatcher.make handlers Dispatcher.not_found in
 	let context = Mongrel2.init

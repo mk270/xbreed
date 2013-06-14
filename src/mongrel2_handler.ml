@@ -31,6 +31,10 @@ end = struct
 
 	let return_generic_response body status =
 		Lwt.return (generic_response body status)
+			
+	let return_generic_error status =
+		let body = Code.body_string_of_status status in
+			Lwt.return (generic_response body status)
 
 	let serve_from_file filename hreq =
 		let restructure_thingy text = 
@@ -43,8 +47,9 @@ end = struct
 					restructure_thingy =|< page_text
 	with
 		| Unix.Unix_error (Unix.ENOENT, _, _) ->
-			return_generic_response "File not found" Code.Not_Found
-		| _ -> return_generic_response "Internal server error" Code.Internal_server_error
+			return_generic_error Code.Not_Found
+		| _ -> 
+			return_generic_error Code.Internal_server_error
 
 	let normal_document s = return_generic_response s Code.OK
 

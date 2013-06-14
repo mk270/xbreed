@@ -14,6 +14,8 @@ open Lwt
 open Mongrel2
 open Pcre
 
+module Dispatcher = struct
+
 let generic_response body code status =
 	Lwt.return {
 		m2resp_body = body;
@@ -74,16 +76,18 @@ let dispatch handlers handle_404 request =
 	in
 		handle handlers
 
-let make_dispatcher handlers not_found =
+let make handlers not_found =
 	dispatch handlers not_found
-	
+
+end
+
 let () =
 	let handlers =  [
-		("^/person$", handler1);
-		("^/ockleon$", handler2);
-		("^/", handler3);
+		("^/person$", Dispatcher.handler1);
+		("^/ockleon$", Dispatcher.handler2);
+		("^/", Dispatcher.handler3);
 	] in
-	let dispatcher = make_dispatcher handlers not_found in
+	let dispatcher = Dispatcher.make handlers Dispatcher.not_found in
 	let context = Mongrel2.init
 		"tcp://127.0.0.1:9999" "tcp://127.0.0.1:9998" dispatcher
 	in

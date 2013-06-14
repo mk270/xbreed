@@ -51,11 +51,6 @@ end = struct
 
 	let normal_document s = generic_response s 200 "OK"
 
-	let handler1 request matched_args =	normal_document "MASH"
-
-	let handler2 request matched_args =
-		respond request
-
 	let serve_file request matched_args =
 		let uri = List.assoc "URI" request.m2req_headers in
 		let filename = "." ^ uri in

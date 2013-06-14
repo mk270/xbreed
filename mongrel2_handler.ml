@@ -41,16 +41,15 @@ let generic_response body code status =
 let serve_from_file filename hreq =
 	let headers = [("Content-type", "text/html")] in
 
-	let page_text =
-		Lwt_io.with_file ~mode:Lwt_io.Input filename Lwt_io.read
-	in
-
 	let restructure_thingy text = {
 		m2resp_body = text;
 		m2resp_code = 200;
 		m2resp_status = "OK";
 		m2resp_headers = headers;
-	}
+	} in
+
+	let page_text =
+		Lwt_io.with_file ~mode:Lwt_io.Input filename Lwt_io.read
 	in
 		restructure_thingy =|< page_text
 

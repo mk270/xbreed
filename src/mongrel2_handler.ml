@@ -22,12 +22,15 @@ module Generator : sig
 
 end = struct
 	let generic_response body status =
-		Lwt.return {
+		{
 			m2resp_body = body;
 			m2resp_code = Code.int_of_status status;
 			m2resp_status = Code.string_of_status status;
 			m2resp_headers = [("Content-type", "text/html")];
 		}
+
+	let return_generic_response body status =
+		Lwt.return (generic_response body status)
 
 	let serve_from_file filename hreq =
 		let headers = [("Content-type", "text/html")] in
@@ -45,10 +48,10 @@ end = struct
 					restructure_thingy =|< page_text
 	with
 		| Unix.Unix_error (Unix.ENOENT, _, _) ->
-			generic_response "File not found" Code.Not_Found
-		| _ -> generic_response "Internal server error" Code.Internal_server_error
+			return_generic_response "File not found" Code.Not_Found
+		| _ -> return_generic_response "Internal server error" Code.Internal_server_error
 
-	let normal_document s = generic_response s Code.OK
+	let normal_document s = return_generic_response s Code.OK
 
 	let serve_file request matched_args =
 		let uri = List.assoc "URI" request.m2req_headers in
@@ -56,7 +59,7 @@ end = struct
 			serve_from_file filename request
 
 	let not_found request matched_args =
-		generic_response "Not found" Code.Not_Found
+		return_generic_response "Not found" Code.Not_Found
 
 end
 

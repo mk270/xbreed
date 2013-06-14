@@ -14,8 +14,10 @@ let footer = "
  </body>
  <script>
    $ = jQuery;
-   $(\".auto-markdown\").each(function() {
-      $(this).html(marked($(this).html()));
+   $().ready(function() {
+     $(\".auto-markdown\").each(function() {
+        $(this).html(marked($(this).html()));
+     });
    });
  </script>
 </html>"

@@ -16,6 +16,9 @@ open Pcre
 
 let uri_of_request request = List.assoc "URI" request.m2req_headers
 
+let file_contents filename = 
+	Lwt_io.with_file ~mode:Lwt_io.Input filename Lwt_io.read
+
 module Generator : sig 
 
 	type handler = Mongrel2.mongrel2_request -> string array -> Mongrel2.mongrel2_response Lwt.t
@@ -51,9 +54,7 @@ end = struct
 			generic_response text Code.OK
 		in
 
-		let page_text =
-			Lwt_io.with_file ~mode:Lwt_io.Input filename Lwt_io.read
-		in
+		let page_text = file_contents filename in
 			page_text >|= filter >|= restructure_thingy
 
 	let normal_document s = return_generic_response s Code.OK

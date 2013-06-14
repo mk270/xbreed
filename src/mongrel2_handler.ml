@@ -69,7 +69,7 @@ end = struct
 	let serve_md_file request matched_args =
 		let uri = uri_of_request request in
 		let filename = "." ^ uri in
-			serve_from_file filename request (fun i -> i)
+			serve_from_file filename request (fun i -> Markdown.wrap i)
 
 	let not_found request matched_args =
 		return_generic_response "Not found" Code.Not_Found

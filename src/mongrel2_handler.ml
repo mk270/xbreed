@@ -45,11 +45,11 @@ end = struct
 					Lwt_io.with_file ~mode:Lwt_io.Input filename Lwt_io.read
 				in
 					restructure_thingy =|< page_text
-	with
-		| Unix.Unix_error (Unix.ENOENT, _, _) ->
-			return_generic_error Code.Not_Found
-		| _ -> 
-			return_generic_error Code.Internal_server_error
+		with
+			| Unix.Unix_error (Unix.ENOENT, _, _) ->
+				return_generic_error Code.Not_Found
+			| _ -> 
+				return_generic_error Code.Internal_server_error
 
 	let normal_document s = return_generic_response s Code.OK
 

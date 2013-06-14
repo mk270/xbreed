@@ -25,6 +25,8 @@ module Generator : sig
 
 	val not_found : 'a -> 'b -> Mongrel2.mongrel2_response Lwt.t
 
+	val return_generic_error : Code.status -> Mongrel2.mongrel2_response Lwt.t
+
 end = struct
 
 	type handler = Mongrel2.mongrel2_request -> string array -> Mongrel2.mongrel2_response Lwt.t
@@ -49,15 +51,10 @@ end = struct
 			generic_response text Code.OK
 		in
 
-		try_lwt let page_text =
-					Lwt_io.with_file ~mode:Lwt_io.Input filename Lwt_io.read
-				in
-					page_text >|= filter >|= restructure_thingy
-		with
-			| Unix.Unix_error (Unix.ENOENT, _, _) ->
-				return_generic_error Code.Not_Found
-			| _ -> 
-				return_generic_error Code.Internal_server_error
+		let page_text =
+			Lwt_io.with_file ~mode:Lwt_io.Input filename Lwt_io.read
+		in
+			page_text >|= filter >|= restructure_thingy
 
 	let normal_document s = return_generic_response s Code.OK
 
@@ -78,10 +75,10 @@ end
 
 module Dispatcher : sig
 	val make : (string *
-					(Mongrel2.mongrel2_request -> string array -> 'a Lwt.t))
+					(Mongrel2.mongrel2_request -> string array -> Mongrel2.mongrel2_response Lwt.t))
            list ->
-           (Mongrel2.mongrel2_request -> 'b array -> 'a Lwt.t) ->
-           Mongrel2.mongrel2_request -> 'a Lwt.t
+           (Mongrel2.mongrel2_request -> string array -> Mongrel2.mongrel2_response Lwt.t) ->
+           Mongrel2.mongrel2_request -> Mongrel2.mongrel2_response Lwt.t
 
 
 end = struct
@@ -94,13 +91,21 @@ end = struct
 				Pcre.extract ~pat uri
 		in
 
+		let guard : (unit -> 'c Lwt.t) -> 'c Lwt.t = fun f ->
+			try_lwt f ()
+			with | Unix.Unix_error (Unix.ENOENT, _, _) ->
+					Generator.return_generic_error Code.Not_Found
+				| _ -> 
+					Generator.return_generic_error Code.Internal_server_error
+		in
+
 		let rec handle = function
 			| [] -> handle_404 request [||]
 			| (url_regexp, handler) :: tl ->
 				try_lwt let args = matches url_regexp in
 							handler request args
 	            with Not_found ->
-					handle tl
+					guard (fun () -> handle tl)
 		in
 			handle handlers
 

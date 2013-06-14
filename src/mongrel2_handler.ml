@@ -33,14 +33,9 @@ end = struct
 		Lwt.return (generic_response body status)
 
 	let serve_from_file filename hreq =
-		let headers = [("Content-type", "text/html")] in
-
-		let restructure_thingy text = {
-			m2resp_body = text;
-			m2resp_code = 200;
-			m2resp_status = "OK";
-			m2resp_headers = headers;
-		} in
+		let restructure_thingy text = 
+			generic_response text Code.OK
+		in
 
 		try_lwt let page_text =
 					Lwt_io.with_file ~mode:Lwt_io.Input filename Lwt_io.read

@@ -30,12 +30,11 @@ let dump_args args =
 		"</html>"
 	in *)
 
-let respond hreq =
+let serve_from_file filename hreq =
 	let headers = [("Content-type", "text/html")] in
 
 	let page_text =
-		let filename = "/etc/services" in
-			Lwt_io.with_file ~mode:Lwt_io.Input filename Lwt_io.read
+		Lwt_io.with_file ~mode:Lwt_io.Input filename Lwt_io.read
 	in
 
 	let restructure_thingy text = {
@@ -46,6 +45,9 @@ let respond hreq =
 	}
 	in
 		restructure_thingy =|< page_text
+
+let respond hreq =
+	serve_from_file "/etc/services" hreq
 
 let normal_document s =
 	Lwt.return {

@@ -23,13 +23,14 @@ let dump_args args =
 			String.concat "\n" rows ^
 		"\n</table>\n"
 
-let respond hreq =
-(*	incr count;
+(*
 	let page_text = "<html> URI was: " ^
 		(dump_args hreq.m2req_headers) ^
 		"<br>" ^ (string_of_int !count) ^
 		"</html>"
 	in *)
+
+let respond hreq =
 	let headers = [("Content-type", "text/html")] in
 
 	let page_text =
@@ -46,15 +47,15 @@ let respond hreq =
 	in
 		restructure_thingy =|< page_text
 
-let handler1 request matched_args =
-	let headers = [("Content-type", "text/html")] in
-
+let normal_document s =
 	Lwt.return {
-		m2resp_body = "MASH";
+		m2resp_body = s;
 		m2resp_code = 200;
 		m2resp_status = "OK";
-		m2resp_headers = headers;
+		m2resp_headers = [("Content-type", "text/html")];
 	}
+
+let handler1 request matched_args =	normal_document "MASH"
 
 let handler2 request matched_args =
 	respond request

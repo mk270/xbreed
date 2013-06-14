@@ -99,9 +99,7 @@ end = struct
 
 end
 
-let () =
-	let inbound_address = "tcp://127.0.0.1:9999" in
-	let outbound_address = "tcp://127.0.0.1:9998" in
+let run inbound_address outbound_address =
 	let handlers =  [
 		("^/", Generator.serve_file);
 	] in
@@ -110,3 +108,8 @@ let () =
 	in
 		Lwt_main.run (Mongrel2.run context);
 		Mongrel2.fini context
+
+let () =
+	let inbound_address = "tcp://127.0.0.1:9999" in
+	let outbound_address = "tcp://127.0.0.1:9998" in
+		run inbound_address outbound_address

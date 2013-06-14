@@ -74,10 +74,8 @@ end = struct
 end
 
 module Dispatcher : sig
-	val make : (string *
-					(Mongrel2.mongrel2_request -> string array -> Mongrel2.mongrel2_response Lwt.t))
-           list ->
-           (Mongrel2.mongrel2_request -> string array -> Mongrel2.mongrel2_response Lwt.t) ->
+	val make : (string * Generator.handler)
+           list -> Generator.handler ->
            Mongrel2.mongrel2_request -> Mongrel2.mongrel2_response Lwt.t
 
 

@@ -48,10 +48,14 @@ let serve_from_file filename hreq =
 		m2resp_headers = headers;
 	} in
 
-	let page_text =
-		Lwt_io.with_file ~mode:Lwt_io.Input filename Lwt_io.read
-	in
-		restructure_thingy =|< page_text
+	try_lwt let page_text =
+				Lwt_io.with_file ~mode:Lwt_io.Input filename Lwt_io.read
+			in
+				restructure_thingy =|< page_text
+	with 
+		| Unix.Unix_error (Unix.ENOENT, _, _) ->
+			generic_response "File not found" 404 "Not Found"
+		| _ -> generic_response "Internal server error" 500 "Internal Server Error"
 
 let respond hreq =
 	serve_from_file "/etc/services" hreq

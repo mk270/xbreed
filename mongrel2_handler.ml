@@ -30,6 +30,14 @@ let dump_args args =
 		"</html>"
 	in *)
 
+let generic_response body code status =
+	Lwt.return {
+		m2resp_body = body;
+		m2resp_code = code;
+		m2resp_status = status;
+		m2resp_headers = [("Content-type", "text/html")];
+	}
+
 let serve_from_file filename hreq =
 	let headers = [("Content-type", "text/html")] in
 
@@ -49,28 +57,20 @@ let serve_from_file filename hreq =
 let respond hreq =
 	serve_from_file "/etc/services" hreq
 
-let normal_document s =
-	Lwt.return {
-		m2resp_body = s;
-		m2resp_code = 200;
-		m2resp_status = "OK";
-		m2resp_headers = [("Content-type", "text/html")];
-	}
+let normal_document s = generic_response s 200 "OK"
 
 let handler1 request matched_args =	normal_document "MASH"
 
 let handler2 request matched_args =
 	respond request
 
-let not_found request matched_args =
-	let headers = [("Content-type", "text/html")] in
+let handler3 request matched_args =
+	let uri = List.assoc "URI" request.m2req_headers in
+	let filename = "." ^ uri in
+		serve_from_file filename request
 
-	Lwt.return {
-		m2resp_body = "Not found";
-		m2resp_code = 404;
-		m2resp_status = "Not Found";
-		m2resp_headers = headers;
-	}
+let not_found request matched_args =
+	generic_response "Not found" 404 "Not Found"
 
 let dispatch request =
 	let matches pat =
@@ -81,6 +81,7 @@ let dispatch request =
 	let handlers = [
 		("^/person$", handler1);
 		("^/ockleon$", handler2);
+		("^/", handler3);
 	] in
 		
 	let rec handle = function

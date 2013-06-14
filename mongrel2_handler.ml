@@ -100,12 +100,13 @@ end = struct
 end
 
 let () =
+	let inbound_address = "tcp://127.0.0.1:9999" in
+	let outbound_address = "tcp://127.0.0.1:9998" in
 	let handlers =  [
 		("^/", Generator.serve_file);
 	] in
 	let dispatcher = Dispatcher.make handlers Generator.not_found in
-	let context = Mongrel2.init
-		"tcp://127.0.0.1:9999" "tcp://127.0.0.1:9998" dispatcher
+	let context = Mongrel2.init inbound_address outbound_address dispatcher
 	in
 		Lwt_main.run (Mongrel2.run context);
 		Mongrel2.fini context

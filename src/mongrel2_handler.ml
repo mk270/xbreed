@@ -23,6 +23,7 @@ module Generator : sig
 
 	val serve_file : handler
 	val serve_md_file : handler
+	val serve_layout_file : handler
 
 	val not_found : 'a -> 'b -> Mongrel2.mongrel2_response Lwt.t
 
@@ -46,14 +47,13 @@ end = struct
 	let return_generic_error status =
 		let body = Code.body_string_of_status status in
 			Lwt.return (generic_response body status)
+
+	let unwrap_ok_text text =
+		generic_response text Code.OK
 				
 	let serve_from_file filename hreq filter =
-		let restructure_thingy text = 
-			generic_response text Code.OK
-		in
-
 		let page_text = file_contents filename in
-			page_text >|= filter >|= restructure_thingy
+			page_text >|= filter >|= unwrap_ok_text
 
 	let normal_document s = return_generic_response s Code.OK
 
@@ -66,6 +66,11 @@ end = struct
 		let uri = uri_of_request request in
 		let filename = "." ^ uri in
 			serve_from_file filename request (fun i -> Markdown.wrap i)
+
+	let serve_layout_file request matched_args =
+		let uri = uri_of_request request in
+		let filename = "." ^ uri in 
+			Layout.make_layout filename >|= unwrap_ok_text
 
 	let not_found request matched_args =
 		return_generic_response "Not found" Code.Not_Found
@@ -113,6 +118,7 @@ end
 
 let run inbound_address outbound_address =
 	let handlers =  [
+		("^/try-mustache.html", Generator.serve_layout_file);
 		("^/.*\\.md$", Generator.serve_md_file);
 		("^/", Generator.serve_file);
 	] in

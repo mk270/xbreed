@@ -40,7 +40,7 @@ let yaml_frontmatter s =
 		(layout, rest)
 
 let interpolate_contents contents template =
-	let rex = Pcre.regexp "{{ ?contents ?}}" in
+	let rex = Pcre.regexp "{{ ?content ?}}" in
 		Pcre.replace ~rex ~templ:contents template
 
 let apply_template docroot (layout, body) = 

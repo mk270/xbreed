@@ -135,7 +135,7 @@ let () =
 	let speclist = [
 		("--in" , Arg.Set_string inbound_address, "TBD");
 		("--out", Arg.Set_string outbound_address, "TBD");
-		("--docroot"; Arg.Set_string docroot, "TBD");
+		("--docroot", Arg.Set_string docroot, "TBD");
 	] in
 	Arg.parse speclist (fun s -> assert false) "Usage: TBD";
 		run !inbound_address !outbound_address !docroot

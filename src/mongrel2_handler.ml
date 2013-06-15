@@ -36,8 +36,7 @@ end = struct
 	let generic_response body status =
 		{
 			m2resp_body = body;
-			m2resp_code = Code.int_of_status status;
-			m2resp_status = Code.string_of_status status;
+			m2resp_status = status;
 			m2resp_headers = [("Content-type", "text/html")];
 		}
 

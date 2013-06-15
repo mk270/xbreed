@@ -22,8 +22,7 @@ type mongrel2_request = {
 
 type mongrel2_response = {
 	m2resp_body : string;
-	m2resp_code : int;
-	m2resp_status : string;
+	m2resp_status : Code.status;
 	m2resp_headers : (string * string) list;
 }
 

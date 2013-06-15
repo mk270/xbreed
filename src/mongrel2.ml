@@ -25,8 +25,7 @@ type mongrel2_request = {
 
 type mongrel2_response = {
 	m2resp_body : string;
-	m2resp_code : int;
-	m2resp_status : string;
+	m2resp_status : Code.status;
 	m2resp_headers : (string * string) list;
 }
 
@@ -102,8 +101,8 @@ module HTTP_Response : sig
 end = struct
 	let make response =
 		let body = response.m2resp_body in
-		let code = response.m2resp_code in
-		let status = response.m2resp_status in
+		let status = Code.string_of_status response.m2resp_status in
+		let code = Code.int_of_status response.m2resp_status in
 		let headers = response.m2resp_headers in
 		let content_length = String.length body in
 		let headers = ("Content-Length", string_of_int content_length) :: headers

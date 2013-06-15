@@ -22,7 +22,6 @@ module Generator : sig
 	type handler = Mongrel2.mongrel2_request -> string array -> Mongrel2.mongrel2_response Lwt.t
 
 	val serve_file : handler
-	val serve_md_file : handler
 	val serve_layout_file : string -> handler
 
 	val not_found : 'a -> 'b -> Mongrel2.mongrel2_response Lwt.t
@@ -60,11 +59,6 @@ end = struct
 		let uri = uri_of_request request in
 		let filename = Util.path_join ["."; uri] in
 			serve_from_file filename request (fun i -> i)
-
-	let serve_md_file request matched_args =
-		let uri = uri_of_request request in
-		let filename =  Util.path_join ["."; uri] in
-			serve_from_file filename request (fun i -> Markdown.wrap i)
 
 	let serve_layout_file docroot request matched_args =
 		let uri = uri_of_request request in

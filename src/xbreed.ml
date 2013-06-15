@@ -24,6 +24,7 @@ module Generator : sig
 
 	val serve_file : string -> handler
 	val serve_md_file : string -> handler
+	val serve_css_file : string -> handler
 	val serve_layout_file : string -> handler
 
 	val not_found : 'a -> 'b -> Mongrel2.mongrel2_response Lwt.t
@@ -52,6 +53,16 @@ end = struct
 
 	let unwrap_ok_text text =
 		generic_response text Code.OK
+
+	let serve_css_file docroot request matched_args =
+		let uri = uri_of_request request in
+		let filename = Util.path_join [docroot; uri] in
+			file_contents filename >>=
+			fun body -> Lwt.return {
+				m2resp_body = body;
+				m2resp_status = Code.OK;
+				m2resp_headers = [("Content-type", "text/css")];
+			}
 				
 	let serve_from_file filename hreq filter =
 		let page_text = file_contents filename in
@@ -118,6 +129,7 @@ end
 let run inbound_address outbound_address docroot =
 	let handlers =  [
 		("^/_layouts/", Generator.not_found);
+		("\\.css$", Generator.serve_css_file docroot);
 		("^/try-mustache.html", Generator.serve_layout_file docroot);
 		("\\.md$", Generator.serve_md_file docroot);
 		("^/", Generator.serve_file docroot);

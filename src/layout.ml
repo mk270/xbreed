@@ -26,7 +26,7 @@ let interpolate replacement template =
 		Str.replace_first (Str.regexp needle) replacement template
 
 let _make_layout template_name docroot filename =
-	let template_name = docroot ^ "/_layouts/" ^ template_name in
+	let template_name = Util.path_join [docroot; "_layouts"; template_name] in
 
 	let modify_template json_string =
 		Util.file_contents template_name >|=

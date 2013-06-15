@@ -36,3 +36,5 @@ val run :  ('a, 'b, 'c, 'd, 'e) t -> unit Lwt.t
 
 val init : string ->
   string -> responder -> ([> `Pull ], [> `Pub ], 'a ZMQ.Socket.t, 'b ZMQ.Socket.t, unit) t
+
+val uri_of_request : mongrel2_request -> string

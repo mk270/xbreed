@@ -31,6 +31,8 @@ type mongrel2_response = {
 
 type responder = mongrel2_request -> mongrel2_response Lwt.t
 
+let uri_of_request request = List.assoc "URI" request.m2req_headers
+
 module Netstring = struct
 	let by_colon = Str.regexp ":"
 

@@ -15,8 +15,6 @@ open Mongrel2
 open Pcre
 open Util
 
-let uri_of_request request = List.assoc "URI" request.m2req_headers
-
 module Generator : sig 
 
 	type handler = 

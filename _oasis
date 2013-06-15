@@ -1,7 +1,7 @@
 OASISFormat: 0.3
-Name:        mongrel2_handler
+Name:        xbreed
 Version:     0.1
-Synopsis:    mks thing
+Synopsis:    OCaml mini-framework using Mongrel2
 Authors:     Martin Keegan
 License:     Apache
 Plugins:     META (0.3)
@@ -10,7 +10,7 @@ BuildTools:  ocamlbuild
 
 Executable base_handler
   Path:               src
-  MainIs:             mongrel2_handler.ml
+  MainIs:             xbreed.ml
   Build$:             flag(lwt)
   Custom:             true
   CompiledObject:     best

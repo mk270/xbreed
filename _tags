@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 1928a6181a8f26c65dbb265144a0b8c8)
+# DO NOT EDIT (digest: 3a576c889c8411858f6b3c9acfecc1a9)
 # Ignore VCS directories, you can use the same kind of rule outside 
 # OASIS_START/STOP if you want to exclude directories that contains 
 # useless stuff for the build process
@@ -14,13 +14,13 @@
 "_darcs": -traverse
 "_darcs": not_hygienic
 # Executable base_handler
-<src/mongrel2_handler.{native,byte}>: pkg_ZMQ
-<src/mongrel2_handler.{native,byte}>: pkg_lwt
-<src/mongrel2_handler.{native,byte}>: pkg_lwt.syntax
-<src/mongrel2_handler.{native,byte}>: pkg_lwt-zmq
-<src/mongrel2_handler.{native,byte}>: pkg_str
-<src/mongrel2_handler.{native,byte}>: pkg_yojson
-<src/mongrel2_handler.{native,byte}>: pkg_pcre
+<src/xbreed.{native,byte}>: pkg_ZMQ
+<src/xbreed.{native,byte}>: pkg_lwt
+<src/xbreed.{native,byte}>: pkg_lwt.syntax
+<src/xbreed.{native,byte}>: pkg_lwt-zmq
+<src/xbreed.{native,byte}>: pkg_str
+<src/xbreed.{native,byte}>: pkg_yojson
+<src/xbreed.{native,byte}>: pkg_pcre
 <src/*.ml{,i}>: pkg_ZMQ
 <src/*.ml{,i}>: pkg_lwt
 <src/*.ml{,i}>: pkg_lwt.syntax
@@ -28,7 +28,7 @@
 <src/*.ml{,i}>: pkg_str
 <src/*.ml{,i}>: pkg_yojson
 <src/*.ml{,i}>: pkg_pcre
-<src/mongrel2_handler.{native,byte}>: custom
+<src/xbreed.{native,byte}>: custom
 # OASIS_STOP
 <src/*.ml{,i}>: syntax_camlp4o
 <src/*.ml{,i}>: annot

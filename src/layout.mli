@@ -1,2 +1,2 @@
 
-val make_layout : string -> string Lwt.t
+val make_layout : string -> string -> string Lwt.t

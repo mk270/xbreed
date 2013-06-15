@@ -23,7 +23,7 @@ module Generator : sig
 
 	val serve_file : handler
 	val serve_md_file : handler
-	val serve_layout_file : handler
+	val serve_layout_file : string -> handler
 
 	val not_found : 'a -> 'b -> Mongrel2.mongrel2_response Lwt.t
 
@@ -66,10 +66,10 @@ end = struct
 		let filename = "." ^ uri in
 			serve_from_file filename request (fun i -> Markdown.wrap i)
 
-	let serve_layout_file request matched_args =
+	let serve_layout_file docroot request matched_args =
 		let uri = uri_of_request request in
-		let filename = "." ^ uri in 
-			Layout.make_layout filename >|= unwrap_ok_text
+		let filename = docroot ^ "/" ^ uri in 
+			Layout.make_layout docroot filename >|= unwrap_ok_text
 
 	let not_found request matched_args =
 		return_generic_response "Not found" Code.Not_Found
@@ -115,10 +115,10 @@ end = struct
 
 end
 
-let run inbound_address outbound_address =
+let run inbound_address outbound_address docroot =
 	let handlers =  [
 		("^/_layouts/", Generator.not_found);
-		("^/try-mustache.html", Generator.serve_layout_file);
+		("^/try-mustache.html", Generator.serve_layout_file docroot);
 		("^/.*\\.md$", Generator.serve_md_file);
 		("^/", Generator.serve_file);
 	] in
@@ -131,9 +131,10 @@ let run inbound_address outbound_address =
 let () =
 	let inbound_address = ref "tcp://127.0.0.1:9999" in
 	let outbound_address = ref "tcp://127.0.0.1:9998" in
+	let docroot = ref "." in
 	let speclist = [
 		("--in" , Arg.Set_string inbound_address, "TBD");
 		("--out", Arg.Set_string outbound_address, "TBD");
 	] in
 	Arg.parse speclist (fun s -> assert false) "Usage: TBD";
-		run !inbound_address !outbound_address
+		run !inbound_address !outbound_address !docroot

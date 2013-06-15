@@ -81,9 +81,10 @@ end = struct
 (* 	type handler = mongrel2_request -> string array -> 'a Lwt.t *)
 
 	let dispatch handlers handle_404 request =
+		let uri = uri_of_request request in
+
 		let matches pat =
-			let uri = uri_of_request request in
-				Pcre.extract ~pat uri
+			Pcre.extract ~pat uri
 		in
 
 		let guard : (unit -> 'c Lwt.t) -> 'c Lwt.t = fun f ->

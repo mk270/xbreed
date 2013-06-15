@@ -86,10 +86,7 @@ end = struct
 
 	let dispatch handlers handle_404 request =
 		let uri = uri_of_request request in
-
-		let matches pat =
-			Pcre.extract ~pat uri
-		in
+		let matches pat = Pcre.extract ~pat uri	in
 
 		let guard : (unit -> 'c Lwt.t) -> 'c Lwt.t = fun f ->
 			try_lwt f ()

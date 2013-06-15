@@ -117,6 +117,7 @@ end
 
 let run inbound_address outbound_address =
 	let handlers =  [
+		("^/_layouts/", Generator.not_found);
 		("^/try-mustache.html", Generator.serve_layout_file);
 		("^/.*\\.md$", Generator.serve_md_file);
 		("^/", Generator.serve_file);

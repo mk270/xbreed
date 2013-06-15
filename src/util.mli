@@ -11,4 +11,4 @@
 (* this code isn't even supposed to be alpha quality - it's just a hack ATM *)
 
 val file_contents : string -> string Lwt.t
-val path_join : string -> string list -> string
+val path_join : string list -> string

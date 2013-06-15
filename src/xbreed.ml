@@ -99,9 +99,9 @@ end = struct
 			| [] -> handle_404 request [||]
 			| (url_regexp, handler) :: tl ->
 				try_lwt let args = matches url_regexp in
-							handler request args
+							guard (fun () -> handler request args)
 	            with Not_found ->
-					guard (fun () -> handle tl)
+					handle tl
 		in
 			Lwt_io.printlf "URI: %s" uri >>= 
 				fun () -> handle handlers

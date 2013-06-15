@@ -139,7 +139,7 @@ let mongrel_handler responder socket socket2 =
 	let lwt_socket = Lwt_zmq.Socket.of_socket socket in
 	let lwt_socket2 = Lwt_zmq.Socket.of_socket socket2 in
 	let loop () =
-		Lwt_io.printl "Listening" >>=
+		return_unit >>=
 		handle_recv lwt_socket >>=
 		handle_reply responder >>=
 		handoff lwt_socket2

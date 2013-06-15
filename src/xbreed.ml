@@ -58,17 +58,17 @@ end = struct
 
 	let serve_file request matched_args =
 		let uri = uri_of_request request in
-		let filename = "." ^ uri in
+		let filename = Util.path_join ["."; uri] in
 			serve_from_file filename request (fun i -> i)
 
 	let serve_md_file request matched_args =
 		let uri = uri_of_request request in
-		let filename = "." ^ uri in
+		let filename =  Util.path_join ["."; uri] in
 			serve_from_file filename request (fun i -> Markdown.wrap i)
 
 	let serve_layout_file docroot request matched_args =
 		let uri = uri_of_request request in
-		let filename = docroot ^ "/" ^ uri in 
+		let filename = Util.path_join [docroot; uri] in 
 			Layout.make_layout docroot filename >|= unwrap_ok_text
 
 	let not_found request matched_args =

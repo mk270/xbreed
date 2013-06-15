@@ -12,3 +12,4 @@
 
 val file_contents : string -> string Lwt.t
 val path_join : string list -> string
+val html_of_markdown : string -> string

@@ -14,3 +14,6 @@ let file_contents filename =
 	Lwt_io.with_file ~mode:Lwt_io.Input filename Lwt_io.read
 
 let path_join elements = String.concat "/" elements
+
+let html_of_markdown s =
+	Cow.Html.to_string (Cow.Markdown.to_html (Cow.Markdown.of_string s))

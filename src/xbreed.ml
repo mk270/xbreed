@@ -103,7 +103,8 @@ end = struct
 	            with Not_found ->
 					guard (fun () -> handle tl)
 		in
-			handle handlers
+			Lwt_io.printlf "URI: %s" uri >>= 
+				fun () -> handle handlers
 
 	let make handlers not_found =
 		dispatch handlers not_found

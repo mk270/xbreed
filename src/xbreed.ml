@@ -19,7 +19,10 @@ let uri_of_request request = List.assoc "URI" request.m2req_headers
 
 module Generator : sig 
 
-	type handler = Mongrel2.mongrel2_request -> string array -> Mongrel2.mongrel2_response Lwt.t
+	type handler = 
+			Mongrel2.mongrel2_request -> 
+			string array -> 
+			Mongrel2.mongrel2_response Lwt.t
 
 	val serve_file : string -> handler
 	val serve_layout_file : string -> handler
@@ -30,14 +33,16 @@ module Generator : sig
 
 end = struct
 
-	type handler = Mongrel2.mongrel2_request -> string array -> Mongrel2.mongrel2_response Lwt.t
+	type handler = 
+			Mongrel2.mongrel2_request -> 
+			string array -> 
+			Mongrel2.mongrel2_response Lwt.t
 
-	let generic_response body status =
-		{
-			m2resp_body = body;
-			m2resp_status = status;
-			m2resp_headers = [("Content-type", "text/html")];
-		}
+	let generic_response body status = {
+		m2resp_body = body;
+		m2resp_status = status;
+		m2resp_headers = [("Content-type", "text/html")];
+	}
 
 	let return_generic_response body status =
 		Lwt.return (generic_response body status)
@@ -71,14 +76,13 @@ end = struct
 end
 
 module Dispatcher : sig
-	val make : (string * Generator.handler)
-           list -> Generator.handler ->
-           Mongrel2.mongrel2_request -> Mongrel2.mongrel2_response Lwt.t
-
+	val make : 
+		(string * Generator.handler) list -> 
+		Generator.handler ->
+        Mongrel2.mongrel2_request -> 
+		Mongrel2.mongrel2_response Lwt.t
 
 end = struct
-
-(* 	type handler = mongrel2_request -> string array -> 'a Lwt.t *)
 
 	let dispatch handlers handle_404 request =
 		let uri = uri_of_request request in
@@ -89,7 +93,8 @@ end = struct
 
 		let guard : (unit -> 'c Lwt.t) -> 'c Lwt.t = fun f ->
 			try_lwt f ()
-			with | Unix.Unix_error (Unix.ENOENT, _, _) ->
+			with 
+				| Unix.Unix_error (Unix.ENOENT, _, _) ->
 					Generator.return_generic_error Code.Not_Found
 				| _ -> 
 					Generator.return_generic_error Code.Internal_server_error

@@ -88,7 +88,7 @@ end = struct
 		let uri = uri_of_request request in
 		let matches pat = Pcre.extract ~pat uri	in
 
-		let guard : (unit -> 'c Lwt.t) -> 'c Lwt.t = fun f ->
+		let guard f =
 			try_lwt f ()
 			with 
 				| Unix.Unix_error (Unix.ENOENT, _, _) ->

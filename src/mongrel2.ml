@@ -124,9 +124,13 @@ let handle_reply responder request =
 		pair_with_hreq >|=
 		uncurry Wire_Format.make_response
 
+let verbose = false
 let handoff sock hres =
 	Lwt_zmq.Socket.send sock hres >>=
-		(fun () -> Lwt_io.printlf "resp: [%s]" hres)
+		(fun () -> 
+			if verbose
+			then Lwt_io.printlf "resp: [%s]" hres
+			else return_unit)
 
 let handle_recv sock () =
 	Lwt_zmq.Socket.recv sock

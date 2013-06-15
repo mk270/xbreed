@@ -30,6 +30,8 @@ type mongrel2_response = {
 	m2resp_headers : (string * string) list;
 }
 
+type responder = mongrel2_request -> mongrel2_response Lwt.t
+
 module Netstring = struct
 	let by_colon = Str.regexp ":"
 

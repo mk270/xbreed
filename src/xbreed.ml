@@ -62,9 +62,6 @@ end = struct
 		let filename = Util.path_join [docroot; uri] in
 			serve_from_file filename request (fun i -> i)
 
-	let html_of_markdown s =
-		Cow.Html.to_string (Cow.Markdown.to_html (Cow.Markdown.of_string s))
-
 	let serve_md_file docroot request matched_args =
 		let uri = uri_of_request request in
 		let filename = Util.path_join [docroot; uri] in

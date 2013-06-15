@@ -57,8 +57,6 @@ end = struct
 		let page_text = file_contents filename in
 			page_text >|= filter >|= unwrap_ok_text
 
-	let normal_document s = return_generic_response s Code.OK
-
 	let serve_file docroot request matched_args =
 		let uri = uri_of_request request in
 		let filename = Util.path_join [docroot; uri] in

@@ -119,7 +119,6 @@ let run inbound_address outbound_address docroot =
 	let handlers =  [
 		("^/_layouts/", Generator.not_found);
 		("^/try-mustache.html", Generator.serve_layout_file docroot);
-		("^/.*\\.md$", Generator.serve_md_file);
 		("^/", Generator.serve_file);
 	] in
 	let dispatcher = Dispatcher.make handlers Generator.not_found in

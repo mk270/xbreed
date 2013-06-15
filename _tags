@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 3a576c889c8411858f6b3c9acfecc1a9)
+# DO NOT EDIT (digest: 0f965ec027c7675e1b5a54795d0c546f)
 # Ignore VCS directories, you can use the same kind of rule outside 
 # OASIS_START/STOP if you want to exclude directories that contains 
 # useless stuff for the build process
@@ -21,6 +21,7 @@
 <src/xbreed.{native,byte}>: pkg_str
 <src/xbreed.{native,byte}>: pkg_yojson
 <src/xbreed.{native,byte}>: pkg_pcre
+<src/xbreed.{native,byte}>: pkg_cow
 <src/*.ml{,i}>: pkg_ZMQ
 <src/*.ml{,i}>: pkg_lwt
 <src/*.ml{,i}>: pkg_lwt.syntax
@@ -28,6 +29,7 @@
 <src/*.ml{,i}>: pkg_str
 <src/*.ml{,i}>: pkg_yojson
 <src/*.ml{,i}>: pkg_pcre
+<src/*.ml{,i}>: pkg_cow
 <src/xbreed.{native,byte}>: custom
 # OASIS_STOP
 <src/*.ml{,i}>: syntax_camlp4o

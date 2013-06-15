@@ -15,5 +15,5 @@ Executable base_handler
   Custom:             true
   CompiledObject:     best
   Install:            false
-  BuildDepends:       ZMQ, lwt, lwt.syntax, lwt-zmq, str, yojson, pcre
+  BuildDepends:       ZMQ, lwt, lwt.syntax, lwt-zmq, str, yojson, pcre, cow
 

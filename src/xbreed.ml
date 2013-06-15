@@ -21,7 +21,7 @@ module Generator : sig
 
 	type handler = Mongrel2.mongrel2_request -> string array -> Mongrel2.mongrel2_response Lwt.t
 
-	val serve_file : handler
+	val serve_file : string -> handler
 	val serve_layout_file : string -> handler
 
 	val not_found : 'a -> 'b -> Mongrel2.mongrel2_response Lwt.t
@@ -55,9 +55,9 @@ end = struct
 
 	let normal_document s = return_generic_response s Code.OK
 
-	let serve_file request matched_args =
+	let serve_file docroot request matched_args =
 		let uri = uri_of_request request in
-		let filename = Util.path_join ["."; uri] in
+		let filename = Util.path_join [docroot; uri] in
 			serve_from_file filename request (fun i -> i)
 
 	let serve_layout_file docroot request matched_args =
@@ -66,7 +66,7 @@ end = struct
 			Layout.make_layout docroot filename >|= unwrap_ok_text
 
 	let not_found request matched_args =
-		return_generic_response "Not found" Code.Not_Found
+		return_generic_response "URL Not found" Code.Not_Found
 
 end
 
@@ -115,7 +115,7 @@ let run inbound_address outbound_address docroot =
 	let handlers =  [
 		("^/_layouts/", Generator.not_found);
 		("^/try-mustache.html", Generator.serve_layout_file docroot);
-		("^/", Generator.serve_file);
+		("^/", Generator.serve_file docroot);
 	] in
 	let dispatcher = Dispatcher.make handlers Generator.not_found in
 	let context = Mongrel2.init inbound_address outbound_address dispatcher

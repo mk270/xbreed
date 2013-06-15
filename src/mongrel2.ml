@@ -1,6 +1,6 @@
 
 (*
-  OCaml-Mongrel2-Handler, a Mongrel2 handler for OCaml
+  XBreed, a Mongrel2 handler for OCaml
 
   Copyright (C) 2013  Martin Keegan
 

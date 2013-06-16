@@ -13,30 +13,30 @@
 open Lwt
 open Mongrel2
 
-	let dispatch handlers handle_404 request =
-		let uri = uri_of_request request in
-		let matches pat = Pcre.extract ~pat uri	in
+let dispatch handlers handle_404 request =
+	let uri = uri_of_request request in
+	let matches pat = Pcre.extract ~pat uri	in
+		
+	let guard f =
+		try_lwt f ()
+		with 
+			| Unix.Unix_error (Unix.ENOENT, _, _) ->
+				Generator.return_generic_error Code.Not_Found
+			| _ -> 
+				Generator.return_generic_error Code.Internal_server_error
+	in
 
-		let guard f =
-			try_lwt f ()
-			with 
-				| Unix.Unix_error (Unix.ENOENT, _, _) ->
-					Generator.return_generic_error Code.Not_Found
-				| _ -> 
-					Generator.return_generic_error Code.Internal_server_error
-		in
-
-		let rec handle = function
-			| [] -> handle_404 request [||]
-			| (url_regexp, handler) :: tl ->
-				try_lwt let args = matches url_regexp in
-							guard (fun () -> handler request args)
-	            with Not_found ->
-					handle tl
-		in
-			Lwt_io.printlf "URI: %s" uri >>= 
-				fun () -> handle handlers
-
-	let make handlers not_found =
-		dispatch handlers not_found
+	let rec handle = function
+		| [] -> handle_404 request [||]
+		| (url_regexp, handler) :: tl ->
+			try_lwt let args = matches url_regexp in
+						guard (fun () -> handler request args)
+            with Not_found ->
+				handle tl
+	in
+		Lwt_io.printlf "URI: %s" uri >>= 
+			fun () -> handle handlers
+	
+let make handlers not_found =
+	dispatch handlers not_found
 

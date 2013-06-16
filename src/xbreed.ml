@@ -51,7 +51,7 @@ end = struct
 		let body = Code.body_string_of_status status in
 			Lwt.return (generic_response body status "text/html")
 
-	let unwrap_ok_text text mime_type =
+	let unwrap_ok_text mime_type text =
 		generic_response text Code.OK mime_type
 
 	let serve_css_file docroot request matched_args =

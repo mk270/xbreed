@@ -51,11 +51,14 @@ end = struct
 		| Css -> "text/css"
 		| Mime_other s -> s
 
-	let generic_response body status mime_type = {
-		m2resp_body = body;
-		m2resp_status = status;
-		m2resp_headers = [("Content-type", (string_of_mime_type mime_type))];
-	}
+	let generic_response body status mime_type = 
+		let mime = string_of_mime_type mime_type in
+		let headers = [("Content-type", mime)] in
+			{
+				m2resp_body = body;
+				m2resp_status = status;
+				m2resp_headers = headers;
+			}
 
 	let return_generic_response body status mime_type =
 		Lwt.return (generic_response body status mime_type)

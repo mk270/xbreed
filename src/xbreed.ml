@@ -38,21 +38,21 @@ end = struct
 			string array -> 
 			Mongrel2.mongrel2_response Lwt.t
 
-	let generic_response body status = {
+	let generic_response body status mime_type = {
 		m2resp_body = body;
 		m2resp_status = status;
-		m2resp_headers = [("Content-type", "text/html")];
+		m2resp_headers = [("Content-type", mime_type)];
 	}
 
-	let return_generic_response body status =
-		Lwt.return (generic_response body status)
+	let return_generic_response body status mime_type =
+		Lwt.return (generic_response body status mime_type)
 			
 	let return_generic_error status =
 		let body = Code.body_string_of_status status in
-			Lwt.return (generic_response body status)
+			Lwt.return (generic_response body status "text/html")
 
-	let unwrap_ok_text text =
-		generic_response text Code.OK
+	let unwrap_ok_text text mime_type =
+		generic_response text Code.OK mime_type
 
 	let serve_css_file docroot request matched_args =
 		let uri = uri_of_request request in
@@ -64,27 +64,27 @@ end = struct
 				m2resp_headers = [("Content-type", "text/css")];
 			}
 				
-	let serve_from_file filename hreq filter =
+	let serve_from_file filename hreq filter mime_type =
 		let page_text = file_contents filename in
-			page_text >|= filter >|= unwrap_ok_text
+			page_text >|= filter >|= unwrap_ok_text mime_type
 
 	let serve_file docroot request matched_args =
 		let uri = uri_of_request request in
 		let filename = Util.path_join [docroot; uri] in
-			serve_from_file filename request (fun i -> i)
+			serve_from_file filename request (fun i -> i) "text/html"
 
 	let serve_md_file docroot request matched_args =
 		let uri = uri_of_request request in
 		let filename = Util.path_join [docroot; uri] in
-			serve_from_file filename request (fun i -> html_of_markdown i)
+			serve_from_file filename request (fun i -> html_of_markdown i) "text/html"
 
 	let serve_layout_file docroot request matched_args =
 		let uri = uri_of_request request in
 		let filename = Util.path_join [docroot; uri] in 
-			Layout.make_layout docroot filename >|= unwrap_ok_text
+			Layout.make_layout docroot filename >|= unwrap_ok_text "text/html"
 
 	let not_found request matched_args =
-		return_generic_response "URL Not found" Code.Not_Found
+		return_generic_response "URL Not found" Code.Not_Found "text/plain"
 
 end
 

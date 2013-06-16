@@ -24,8 +24,11 @@ let dispatch handlers handle_404 request =
 		
 	let guard f =
 		try_lwt f ()
-		with e ->
-			let status = status_from_error e in
+		with exn ->
+			let error = Printexc.to_string exn in
+			let status = status_from_error exn in
+				Lwt_io.printlf "Error: `%s'" error >>=
+					fun () ->
 				Lwt_io.printl (Printexc.get_backtrace ()) >>=
 					fun () -> Generator.return_generic_error status
 

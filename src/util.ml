@@ -10,6 +10,8 @@
 
 (* this code isn't even supposed to be alpha quality - it's just a hack ATM *)
 
+open Pcre
+
 let file_contents filename = 
 	Lwt_io.with_file ~mode:Lwt_io.Input filename Lwt_io.read
 
@@ -17,3 +19,10 @@ let path_join elements = String.concat "/" elements
 
 let html_of_markdown s =
 	Cow.Html.to_string (Cow.Markdown.to_html (Cow.Markdown_github.of_string s))
+
+let ext_of_filename s =
+	let words = Pcre.asplit ~pat:"\\." s in
+		match words with
+			| [||] -> None
+			| [|n|] -> None
+			| a -> let len = Array.length a in Some a.(len - 1)

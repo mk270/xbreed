@@ -14,44 +14,6 @@ open Lwt
 open Mongrel2
 open Util
 
-module Dispatcher : sig
-	val make : 
-		(string * Generator.handler) list -> 
-		Generator.handler ->
-        Mongrel2.mongrel2_request -> 
-		Mongrel2.mongrel2_response Lwt.t
-
-end = struct
-
-	let dispatch handlers handle_404 request =
-		let uri = uri_of_request request in
-		let matches pat = Pcre.extract ~pat uri	in
-
-		let guard f =
-			try_lwt f ()
-			with 
-				| Unix.Unix_error (Unix.ENOENT, _, _) ->
-					Generator.return_generic_error Code.Not_Found
-				| _ -> 
-					Generator.return_generic_error Code.Internal_server_error
-		in
-
-		let rec handle = function
-			| [] -> handle_404 request [||]
-			| (url_regexp, handler) :: tl ->
-				try_lwt let args = matches url_regexp in
-							guard (fun () -> handler request args)
-	            with Not_found ->
-					handle tl
-		in
-			Lwt_io.printlf "URI: %s" uri >>= 
-				fun () -> handle handlers
-
-	let make handlers not_found =
-		dispatch handlers not_found
-
-end
-
 let run inbound_address outbound_address docroot =
 	let handlers =  [
 		("^/_layouts/", Generator.not_found);

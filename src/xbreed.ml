@@ -68,10 +68,19 @@ end = struct
 		let page_text = file_contents filename in
 			page_text >|= filter >|= unwrap_ok_text mime_type
 
+	let mime_type_of_extn = function
+		| Some "txt" -> "text/plain"
+		| Some "css" -> "text/css"
+		| Some "js" -> "application/javascript"
+		| Some "html" -> "text/html"
+		| _ -> "text/html"
+
 	let serve_file docroot request matched_args =
 		let uri = uri_of_request request in
 		let filename = Util.path_join [docroot; uri] in
-			serve_from_file filename request (fun i -> i) "text/html"
+		let ext = Util.ext_of_filename filename in
+		let mime_type = mime_type_of_extn ext in
+			serve_from_file filename request (fun i -> i) mime_type
 
 	let serve_md_file docroot request matched_args =
 		let uri = uri_of_request request in

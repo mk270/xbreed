@@ -18,7 +18,8 @@ let dispatch handlers handle_404 request =
 	let matches pat = Pcre.extract ~pat uri	in
 
 	let status_from_error = function
-		| Unix.Unix_error (Unix.ENOENT, _, _) -> Code.Not_Found
+		| Unix.Unix_error (Unix.ENOENT, _, _)
+		| Unix.Unix_error (Unix.EISDIR, _, _) -> Code.Not_Found
 		| _ -> Code.Internal_server_error
 	in
 		

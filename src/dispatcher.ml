@@ -16,14 +16,19 @@ open Mongrel2
 let dispatch handlers handle_404 request =
 	let uri = uri_of_request request in
 	let matches pat = Pcre.extract ~pat uri	in
+
+	let status_from_error = function
+			| Unix.Unix_error (Unix.ENOENT, _, _) -> Code.Not_Found
+			| _ -> Code.Internal_server_error
+	in
 		
 	let guard f =
 		try_lwt f ()
-		with 
-			| Unix.Unix_error (Unix.ENOENT, _, _) ->
-				Generator.return_generic_error Code.Not_Found
-			| _ -> 
-				Generator.return_generic_error Code.Internal_server_error
+		with e ->
+			let status = status_from_error e in
+				Lwt_io.printl (Printexc.get_backtrace ()) >>=
+					fun () -> Generator.return_generic_error status
+
 	in
 
 	let rec handle = function

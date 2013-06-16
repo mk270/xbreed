@@ -34,3 +34,5 @@
 # OASIS_STOP
 <src/*.ml{,i}>: syntax_camlp4o
 <src/*.ml{,i}>: annot
+<src/*.ml{,i}>: debug
+<src/xbreed.{native,byte}>: debug

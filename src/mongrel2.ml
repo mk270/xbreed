@@ -15,6 +15,8 @@ open Lwt
 open Str
 open Yojson.Safe
 
+exception Header_not_string
+
 type mongrel2_request = {
 	m2req_uuid : string;
 	m2req_conn_id : int;
@@ -58,7 +60,7 @@ end = struct
 	let parse_headers hh =
 		let get_string = function
 			| key, `String s -> key, s
-			| _ -> assert false
+			| _ -> raise Header_not_string
 		in
 
 		let tmp = Yojson.Safe.from_string hh in
@@ -117,6 +119,7 @@ end = struct
 			sprintf "HTTP/1.1 %d %s\r\n%s\r\n\r\n%s" code status headers' body
 end
 
+(* FIXME: parse_request can fail *)
 let handle_reply responder request =
 	let uncurry f (x, y) = f x y in
 	let hreq = Wire_Format.parse_request request in
@@ -137,6 +140,7 @@ let handoff sock hres =
 let handle_recv sock () =
 	Lwt_zmq.Socket.recv sock
 
+(* FIXME: loop needs guard *)
 let mongrel_handler responder socket socket2 =
 	let lwt_socket = Lwt_zmq.Socket.of_socket socket in
 	let lwt_socket2 = Lwt_zmq.Socket.of_socket socket2 in

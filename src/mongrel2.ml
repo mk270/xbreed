@@ -140,6 +140,10 @@ let handoff sock hres =
 let handle_recv sock () =
 	Lwt_zmq.Socket.recv sock
 
+let guard_thunk f =
+	try_lwt f ()
+	with _ -> return () (* FIXME: can do better *)
+
 (* FIXME: loop needs guard *)
 let mongrel_handler responder socket socket2 =
 	let lwt_socket = Lwt_zmq.Socket.of_socket socket in
@@ -151,7 +155,7 @@ let mongrel_handler responder socket socket2 =
 		handoff lwt_socket2
 	in
 		while_lwt true
-			do loop ()
+			do guard_thunk (fun () -> loop ())
 			done
 
 type ('a, 'b, 'c, 'd, 'e) t = {

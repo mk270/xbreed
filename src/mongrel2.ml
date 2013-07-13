@@ -16,6 +16,7 @@ open Str
 open Yojson.Safe
 
 exception Header_not_string
+exception No_URI_Header
 
 type mongrel2_request = {
 	m2req_uuid : string;
@@ -33,7 +34,9 @@ type mongrel2_response = {
 
 type responder = mongrel2_request -> mongrel2_response Lwt.t
 
-let uri_of_request request = List.assoc "URI" request.m2req_headers
+let uri_of_request request = 
+	try List.assoc "URI" request.m2req_headers
+	with Not_found -> raise No_URI_Header
 
 module Netstring = struct
 	let by_colon = Str.regexp ":"

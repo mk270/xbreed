@@ -11,7 +11,6 @@ BuildTools:  ocamlbuild
 Executable base_handler
   Path:               src
   MainIs:             xbreed.ml
-  Build$:             flag(lwt)
   Custom:             true
   CompiledObject:     best
   Install:            false

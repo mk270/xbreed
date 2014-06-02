@@ -19,6 +19,7 @@ type handler =
 val serve_file : string -> handler
 val serve_md_file : string -> handler
 val serve_layout_file : string -> handler
+val pg_now : string -> handler
 
 val not_found : 'a -> 'b -> Mongrel2.mongrel2_response Lwt.t
 

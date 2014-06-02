@@ -19,6 +19,7 @@ let run inbound_address outbound_address docroot =
 		("^/_layouts/", Generator.not_found);
 		("^/favicon.ico$", Generator.not_found);
 		("^/try-mustache.html", Generator.serve_layout_file docroot);
+		("^/pg_now/$", Generator.pg_now docroot);
 		("\\.md$", Generator.serve_md_file docroot);
 		("^/", Generator.serve_file docroot);
 	] in

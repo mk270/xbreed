@@ -83,3 +83,8 @@ let serve_layout_file docroot request matched_args =
 			
 let not_found request matched_args =
 	return_generic_response "URL Not found" Code.Not_Found Text_plain
+
+let pg_now (docroot : string) request matched_args =
+    lwt body = Db.run_query () in
+        Lwt.return (generic_response body Code.OK Text_plain)
+	

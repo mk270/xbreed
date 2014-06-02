@@ -12,7 +12,6 @@
 
 open Yojson.Safe
 open Lwt
-open Pcre
 
 exception Frontmatter_not_found
 

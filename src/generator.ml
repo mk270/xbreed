@@ -72,9 +72,11 @@ let serve_file docroot request matched_args =
 		serve_from_file filename request (fun i -> i) mime_type
 
 let serve_md_file docroot request matched_args =
+(*	let render = fun i -> html_of_markdown i in *)
+	let render = fun i -> i in
 	let uri = uri_of_request request in
 	let filename = Util.path_join [docroot; uri] in
-		serve_from_file filename request (fun i -> html_of_markdown i) Text_html
+		serve_from_file filename request render Text_html
 			
 let serve_layout_file docroot request matched_args =
 	let uri = uri_of_request request in

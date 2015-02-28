@@ -15,8 +15,10 @@ let file_contents filename =
 
 let path_join elements = String.concat "/" elements
 
+(*
 let html_of_markdown s =
 	Cow.Html.to_string (Cow.Markdown.to_html (Cow.Markdown_github.of_string s))
+*)
 
 let ext_of_filename s =
     let rex = Re_pcre.regexp "\\." in

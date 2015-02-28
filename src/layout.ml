@@ -44,7 +44,7 @@ let interpolate_contents contents template =
 
 let apply_template docroot (layout, body) = 
 	let layout_file = layout ^ ".html" in
-	let rendered_body = Util.html_of_markdown body in
+	let rendered_body = (* Util.html_of_markdown *) body in
 	let template_name = Util.path_join [docroot; "_layouts"; layout_file] in
 		Util.file_contents template_name >|=
 			interpolate_contents rendered_body
